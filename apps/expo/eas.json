@@ -10,7 +10,8 @@
         "image": "latest"
       },
       "env": {
-        "TAMAGUI_TARGET": "native"
+        "TAMAGUI_TARGET": "native",
+        "NEXT_PUBLIC_SHOW_BABYLON_INSPECTOR": "false"
       }
     },
     "production": {
@@ -19,7 +20,8 @@
         "buildType": "app-bundle"
       },
       "env": {
-        "TAMAGUI_TARGET": "native"
+        "TAMAGUI_TARGET": "native",
+        "NEXT_PUBLIC_SHOW_BABYLON_INSPECTOR": "false"
       }
     }
   }

@@ -2,15 +2,10 @@ import ms from "ms";
 
 export const timeAgo = (timestamp: Date, timeOnly?: boolean): string => {
   if (!timestamp) return "never";
-  return `${ms(Date.now() - new Date(timestamp).getTime())}${
-    timeOnly ? "" : " ago"
-  }`;
+  return `${ms(Date.now() - new Date(timestamp).getTime())}${timeOnly ? "" : " ago"}`;
 };
 
-export async function fetcher<JSON = any>(
-  input: RequestInfo,
-  init?: RequestInit
-): Promise<JSON> {
+export async function fetcher<JSON = any>(input: RequestInfo, init?: RequestInit): Promise<JSON> {
   const res = await fetch(input, init);
 
   if (!res.ok) {
@@ -47,9 +42,7 @@ export function nFormatter(num: number, digits?: number) {
     .find(function (item) {
       return num >= item.value;
     });
-  return item
-    ? (num / item.value).toFixed(digits || 1).replace(rx, "$1") + item.symbol
-    : "0";
+  return item ? (num / item.value).toFixed(digits || 1).replace(rx, "$1") + item.symbol : "0";
 }
 
 export function capitalize(str: string) {
@@ -75,7 +68,13 @@ export function isWebview(): boolean {
   const ios = /iphone|ipod|ipad|macintosh/.test(userAgent);
   const ios_ipad_webview = ios && !safari;
 
-  return ios
-    ? (!standalone && !safari) || ios_ipad_webview
-    : userAgent.includes("wv");
+  return ios ? (!standalone && !safari) || ios_ipad_webview : userAgent.includes("wv");
+}
+
+export function isBabylonInspectorShowing() {
+  return (
+    process.env.NODE_ENV === "development" &&
+    typeof window !== "undefined" &&
+    document.getElementById("sceneExplorer")
+  );
 }

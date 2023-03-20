@@ -147,6 +147,10 @@ yarn native
 
 and selecting Android.
 
+# env vars
+
+- See TAMAGUI_TARGET for an example
+
 # Jest
 
 TODO:

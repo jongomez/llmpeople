@@ -1,3 +1,5 @@
 export * from 'tamagui'
+export { Chat } from './Chat'
+export { Loading } from './Loading'
 export * from './MyComponent'
 export { config } from './tamagui.config'

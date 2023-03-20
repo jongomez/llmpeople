@@ -5,10 +5,11 @@ import {
   EnvironmentHelper,
   HemisphericLight,
   MeshBuilder,
+  Nullable,
   Scene,
 } from "babylonjs";
 import { handleError } from "../error";
-import { isWebview } from "../utils";
+import { isBabylonInspectorShowing } from "../utils";
 import Humanoid from "./Humanoid";
 import { createCamera } from "./objects";
 import { v3 } from "./utils";
@@ -17,24 +18,19 @@ const loadCharacter = (scene: Scene) => {
   const meshName = "MyMesh";
 
   // First time loading this character. Create a new Humanoid instance.
-  let newChar = new Humanoid(
-    meshName,
-    "Model2_2.babylon",
-    scene,
-    "talking3",
-    () => {
-      console.log("After import callback called.");
-    }
-  );
+  let newChar = new Humanoid(meshName, "Model2_2.babylon", scene, "talking3", () => {
+    console.log("After import callback called!!!");
+  });
 };
 
-const loadBackground = (scene: Scene): EnvironmentHelper => {
+const loadBackground = (scene: Scene): Nullable<EnvironmentHelper> => {
   var options = {
     groundColor: Color3.White(),
     groundSize: 4,
   };
 
   const environmentHelper = scene.createDefaultEnvironment(options);
+
   return environmentHelper;
 };
 
@@ -53,9 +49,7 @@ const enableCollisions = (scene: Scene, camera: ArcRotateCamera) => {
   scene.collisionsEnabled = true;
 };
 
-export const initBabylon = (
-  setIsLoading: (isLoading: boolean) => void
-): string => {
+export const initBabylon = (setIsLoading: (isLoading: boolean) => void) => {
   console.log("Initializing scene...");
 
   // Get the canvas DOM element
@@ -69,16 +63,24 @@ export const initBabylon = (
   }
 
   // Load the 3D engine
-  let engine: Engine = null;
+  let engine: Engine;
   try {
     engine = new Engine(canvas, true, {
       preserveDrawingBuffer: true,
       stencil: true,
     });
-  } catch (e) {
+  } catch (e: any) {
     console.error(e.message);
     return e.message;
   }
+
+  // function customLoadingScreen() {
+  //   console.log("customLoadingScreen creation");
+  // }
+  // customLoadingScreen.prototype.displayLoadingUI = function () {};
+  // customLoadingScreen.prototype.hideLoadingUI = function () {};
+  // var loadingScreen = new customLoadingScreen();
+  // engine.loadingScreen = loadingScreen;
 
   // XXX: NOTE: This is really important to tell Babylon.js to use decomposeLerp and matrix interpolation
   BABYLON.Animation.AllowMatricesInterpolation = true;
@@ -124,13 +126,11 @@ const createScene = function (engine: Engine, canvas: HTMLCanvasElement) {
 
   enableCollisions(scene, camera);
 
-  if (
-    typeof window !== "undefined" &&
-    !document.getElementById("sceneExplorer") &&
-    !isWebview()
-  ) {
+  console.log("\n\nbababab", process.env.NEXT_PUBLIC_SHOW_BABYLON_INSPECTOR);
+  if (!isBabylonInspectorShowing() && process.env.NEXT_PUBLIC_SHOW_BABYLON_INSPECTOR === "true") {
     import("babylonjs-inspector");
-    scene.debugLayer.show();
+    // overlay: true does not create a parent div for the canvas. It just adds the inspector elements as siblings.
+    scene.debugLayer.show({ overlay: true });
   }
 
   // Return the created scene
