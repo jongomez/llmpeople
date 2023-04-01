@@ -6,6 +6,9 @@ import React, { useEffect, useState } from "react";
 
 let didInit = false;
 
+// XXX: Setting the following to "false" helps when developing UI stuff. Because the canvas is not rendered, the UI is much faster to develop.
+const showCanvas = true;
+
 interface CanvasThatDoesNotReRenderProps {
   setInitErrorMessage: (initErrorMessage: string) => void;
   setIsLoading: (isLoading: boolean) => void;
@@ -44,7 +47,7 @@ const CanvasThatDoesNotReRender = React.memo(function CanvasThatDoesNotReRender(
 
 export default function Game() {
   const [initErrorMessage, setInitErrorMessage] = useState<string>("");
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(showCanvas);
   const chatInputWidth = 300;
   const chatInputHeight = 80;
 
@@ -75,10 +78,12 @@ export default function Game() {
           position: "relative",
         }}
       >
-        <CanvasThatDoesNotReRender
-          setIsLoading={setIsLoading}
-          setInitErrorMessage={setInitErrorMessage}
-        />
+        {showCanvas && (
+          <CanvasThatDoesNotReRender
+            setIsLoading={setIsLoading}
+            setInitErrorMessage={setInitErrorMessage}
+          />
+        )}
         <Chat
           display={isLoading ? "none" : "flex"}
           right={isBabylonInspectorShowing() ? "300px" : "0px"}

@@ -153,10 +153,10 @@ and selecting Android.
 
 # Jest
 
-TODO:
-
-- Get jest config from old gpthangout repo.
-
 Run individual test files with:
 
 npx jest path/to/testFile.test.ts --watch
+
+e.g. go into the apps/next folder, and run:
+
+npx jest **tests**/messagesAPI.test.ts --watch
