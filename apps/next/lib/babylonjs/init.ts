@@ -126,7 +126,6 @@ const createScene = function (engine: Engine, canvas: HTMLCanvasElement) {
 
   enableCollisions(scene, camera);
 
-  console.log("\n\nbababab", process.env.NEXT_PUBLIC_SHOW_BABYLON_INSPECTOR);
   if (!isBabylonInspectorShowing() && process.env.NEXT_PUBLIC_SHOW_BABYLON_INSPECTOR === "true") {
     import("babylonjs-inspector");
     // overlay: true does not create a parent div for the canvas. It just adds the inspector elements as siblings.

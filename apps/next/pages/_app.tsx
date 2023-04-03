@@ -1,3 +1,4 @@
+import { GameContextProvider } from "@my/ui/src/GameContextProvider";
 import "@tamagui/core/reset.css";
 import "@tamagui/font-inter/css/400.css";
 import "@tamagui/font-inter/css/700.css";
@@ -17,14 +18,16 @@ function MyApp({ Component, pageProps }: SolitoAppProps) {
   return (
     <>
       <Head>
-        <title>Tamagui Example App</title>
-        <meta name="description" content="Tamagui, Solito, Expo & Next.js" />
-        <link rel="icon" href="/favicon.ico" />
+        <title>GPT Hangout</title>
+        <meta name="description" content="Hangout with GPT characters" />
+        {/* <link rel="icon" href="/favicon.ico" /> */}
       </Head>
       <ThemeProvider>
-        <QueryClientProvider client={queryClient}>
-          <Component {...pageProps} />
-        </QueryClientProvider>
+        <GameContextProvider>
+          <QueryClientProvider client={queryClient}>
+            <Component {...pageProps} />
+          </QueryClientProvider>
+        </GameContextProvider>
       </ThemeProvider>
     </>
   );
