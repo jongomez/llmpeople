@@ -8,20 +8,12 @@ import {
   Nullable,
   Scene,
 } from "babylonjs";
+import { CanvasThatDoesNotReRenderProps } from "pages";
 import { handleError } from "../error";
 import { isBabylonInspectorShowing } from "../utils";
-import Humanoid from "./Humanoid";
+import { Humanoid } from "./Humanoid";
 import { createCamera } from "./objects";
 import { v3 } from "./utils";
-
-const loadCharacter = (scene: Scene) => {
-  const meshName = "MyMesh";
-
-  // First time loading this character. Create a new Humanoid instance.
-  let newChar = new Humanoid(meshName, "Model2_2.babylon", scene, "talking3", () => {
-    console.log("After import callback called!!!");
-  });
-};
 
 const loadBackground = (scene: Scene): Nullable<EnvironmentHelper> => {
   var options = {
@@ -49,7 +41,10 @@ const enableCollisions = (scene: Scene, camera: ArcRotateCamera) => {
   scene.collisionsEnabled = true;
 };
 
-export const initBabylon = (setIsLoading: (isLoading: boolean) => void) => {
+export const initBabylon = (
+  setIsLoading: (isLoading: boolean) => void,
+  humanoidRef: CanvasThatDoesNotReRenderProps["humanoidRef"]
+) => {
   console.log("Initializing scene...");
 
   // Get the canvas DOM element
@@ -87,6 +82,17 @@ export const initBabylon = (setIsLoading: (isLoading: boolean) => void) => {
 
   var scene = createScene(engine, canvas);
 
+  // First time loading this character. Create a new Humanoid instance.
+  humanoidRef.current = new Humanoid(
+    "MyMesh",
+    "Model3_11.babylon",
+    scene,
+    "idle3_hand_hips",
+    () => {
+      // console.log("After import callback called!");
+    }
+  );
+
   engine.runRenderLoop(function () {
     // NOTE: The following executeWhenReady makes sure we only show stuff when everything is:
     // - Done loading
@@ -121,8 +127,6 @@ const createScene = function (engine: Engine, canvas: HTMLCanvasElement) {
   // const box = MeshBuilder.CreateBox("box", { size: 1 }, scene);
 
   const environmentHelper = loadBackground(scene);
-
-  loadCharacter(scene);
 
   enableCollisions(scene, camera);
 

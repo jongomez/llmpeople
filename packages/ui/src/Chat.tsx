@@ -1,11 +1,21 @@
 import { Send } from "@tamagui/lucide-icons";
 import { memo } from "react";
-import { Button, ScrollView, StackPropsBase, Text, TextArea, XStack, YStack } from "tamagui";
+import {
+  Button,
+  ScrollView,
+  Spinner,
+  StackPropsBase,
+  Text,
+  TextArea,
+  XStack,
+  YStack,
+  useMedia,
+} from "tamagui";
 import { ChatErrors } from "./ChatErrors";
 import { fetchAudio } from "./helpers";
 import { ChatHookReturnType, useChat } from "./hooks";
 
-const OPENAI_TIMEOUT_MILLISECONDS = 20_000;
+const OPENAI_TIMEOUT_MILLISECONDS = 5_000;
 const CHAT_MESSAGES_URL = "/api/chat";
 const alpha = "0.9";
 const scrollViewBackgroundColor = `rgba(255, 255, 255,${alpha})`;
@@ -22,7 +32,9 @@ export type ChatServerResponse =
       error: string;
     };
 
-type ChatProps = StackPropsBase;
+type ChatProps = StackPropsBase & {
+  audioReceivedCallback: (audio: HTMLAudioElement | null) => void;
+};
 
 // This function is called when a user wants to send a message to the backend. It does the following:
 // 1. Appends the user's message to the existing messages array. This shows the message in the chat's scroll view.
@@ -32,8 +44,13 @@ const send = (
   setChatState: ChatHookReturnType["setChatState"],
   appendBotMessage: ChatHookReturnType["appendBotMessage"],
   appendUserMessage: ChatHookReturnType["appendUserMessage"],
-  audioRef: React.MutableRefObject<HTMLAudioElement | null>
+  audioReceivedCallback: ChatProps["audioReceivedCallback"],
+  isStreamingMessage: boolean
 ) => {
+  if (isStreamingMessage) {
+    return;
+  }
+
   const textInput = textAreaRef?.current?.value;
 
   if (textAreaRef?.current && textInput) {
@@ -61,9 +78,12 @@ const send = (
       appendBotMessage
     );
 
+    // After we get a text message from the backend, we generate an audio file for that message.
     botResponsePromise.then((botResponse: string) => {
       if (botResponse) {
-        fetchAudio(botResponse, audioRef);
+        fetchAudio(botResponse).then((audio: HTMLAudioElement | null) =>
+          audioReceivedCallback(audio)
+        );
       }
     });
   }
@@ -74,6 +94,14 @@ const sendMessages = async (
   setChatState: ChatHookReturnType["setChatState"],
   appendBotMessage: ChatHookReturnType["appendBotMessage"]
 ): Promise<string> => {
+  let message = "";
+  let errorMessage = "";
+
+  setChatState((currentState) => ({
+    ...currentState,
+    isStreamingMessage: true,
+  }));
+
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
@@ -108,7 +136,6 @@ const sendMessages = async (
     const reader = data.getReader();
     const decoder = new TextDecoder();
     let done = false;
-    let message = "";
 
     while (!done) {
       const { value, done: doneReading } = await reader.read();
@@ -120,21 +147,21 @@ const sendMessages = async (
     }
 
     clearTimeout(timeoutId);
-
-    return message;
   } catch (error) {
-    let errorMessage = error.message || "Error: something went wrong.";
+    errorMessage = error.message || "Error: something went wrong.";
+
     if (error.name === "AbortError") {
       errorMessage = "One of your requests timed out :( please try again.";
     }
-
-    setChatState((currentState) => ({
-      ...currentState,
-      errorMessage,
-    }));
   }
 
-  return "";
+  setChatState((currentState) => ({
+    ...currentState,
+    errorMessage,
+    isStreamingMessage: false,
+  }));
+
+  return message;
 };
 
 // This component takes care of showing the messages in the chat's scroll view.
@@ -169,23 +196,28 @@ const PrintMessages = memo(({ messages }: { messages: ChatMessage[] }) => {
 });
 
 // Main chat component.
-export const Chat = ({ ...stackProps }: ChatProps) => {
+export const Chat = ({ audioReceivedCallback, ...stackProps }: ChatProps) => {
   const {
     chatState,
     setChatState,
     textAreaRef,
     messagesContainerRef,
-    audioRef,
     appendBotMessage,
     appendUserMessage,
   } = useChat();
+  const media = useMedia();
+
+  const { isStreamingMessage } = chatState;
 
   // Constant numbers:
-  const messagesBoxHeight = 300;
+  const regularMessagesBoxHeight = 300;
+  const smallMessagesBoxHeight = 170;
   const width = 300;
   const textAreaHeight = 60;
   const buttonMarginLeft = 8;
   const buttonSize = 50;
+
+  const isSmall = media.xs;
 
   return (
     <YStack
@@ -196,28 +228,30 @@ export const Chat = ({ ...stackProps }: ChatProps) => {
       right="0"
       m={20}
       w={width}
+      maxWidth="90vw"
       {...stackProps}
     >
       <ScrollView
         ref={messagesContainerRef}
-        maxHeight={messagesBoxHeight}
+        maxHeight={isSmall ? smallMessagesBoxHeight : regularMessagesBoxHeight}
         backgroundColor={scrollViewBackgroundColor}
         mb={8}
         br={8}
-        width={width}
+        width="100%"
         onContentSizeChange={() => messagesContainerRef.current?.scrollToEnd({ animated: true })}
       >
         <PrintMessages messages={chatState.messages} />
       </ScrollView>
-      <XStack ai="center">
+      <XStack ai="center" width="100%">
         {/* DOCS: https://necolas.github.io/react-native-web/docs/text-input/ */}
         <TextArea
           // TODO: Get the real TextInput type from react native, and remove the below @ts-expect-error
           // @ts-expect-error
           ref={textAreaRef}
           h={textAreaHeight}
-          w={width - buttonSize - buttonMarginLeft}
-          placeholder="Type message here"
+          // w={width - buttonSize - buttonMarginLeft}
+          placeholder={chatState.isStreamingMessage ? "Loading message..." : "Type message here"}
+          disabled={chatState.isStreamingMessage}
           returnKeyType="send"
           multiline
           blurOnSubmit={false}
@@ -225,25 +259,61 @@ export const Chat = ({ ...stackProps }: ChatProps) => {
             // Handle browser submit.
             if (e.nativeEvent.key === "Enter" && "shiftKey" in e && !e.shiftKey) {
               e.preventDefault(); // Prevent a new line from being added
-              send(textAreaRef, setChatState, appendBotMessage, appendUserMessage, audioRef);
+              send(
+                textAreaRef,
+                setChatState,
+                appendBotMessage,
+                appendUserMessage,
+                audioReceivedCallback,
+                isStreamingMessage
+              );
             }
           }}
           onSubmitEditing={() =>
             // Handle Android and iOS submit.
-            send(textAreaRef, setChatState, appendBotMessage, appendUserMessage, audioRef)
+            send(
+              textAreaRef,
+              setChatState,
+              appendBotMessage,
+              appendUserMessage,
+              audioReceivedCallback,
+              isStreamingMessage
+            )
           }
           maxLength={MAX_CHARS}
           onChangeText={(text: string) => setChatState({ ...chatState, charCount: text.length })}
         />
-        <Button
-          size={buttonSize}
-          ml={buttonMarginLeft}
-          icon={<Send size="$1" />}
-          br="100%"
-          onPress={() =>
-            send(textAreaRef, setChatState, appendBotMessage, appendUserMessage, audioRef)
-          }
-        />
+
+        {isStreamingMessage ? (
+          <Spinner
+            height={buttonSize}
+            width={buttonSize}
+            size="small"
+            jc="center"
+            ai="center"
+            color="$gray10"
+            ml={buttonMarginLeft}
+            backgroundColor="#F3F3F3"
+            br="100%"
+          />
+        ) : (
+          <Button
+            size={buttonSize}
+            ml={buttonMarginLeft}
+            icon={<Send size="$1" />}
+            br="100%"
+            onPress={() =>
+              send(
+                textAreaRef,
+                setChatState,
+                appendBotMessage,
+                appendUserMessage,
+                audioReceivedCallback,
+                isStreamingMessage
+              )
+            }
+          />
+        )}
       </XStack>
       <ChatErrors errorMessage={chatState.errorMessage} charCount={chatState.charCount} />
     </YStack>

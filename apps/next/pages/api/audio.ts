@@ -1,7 +1,9 @@
 import { TextToSpeechClient } from "@google-cloud/text-to-speech";
+import { dummyBotAudio } from "lib/dummyResponses";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 const MAX_REQUEST_BODY_LENGTH = 1000;
+const USE_DUMMY_AUDIO = false;
 
 interface TextToSpeechResponse {
   audioContent: string;
@@ -52,12 +54,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(400).send(`Request body exceeds ${MAX_REQUEST_BODY_LENGTH} characters.`);
   }
 
+  if (USE_DUMMY_AUDIO) {
+    res.setHeader("Content-Type", "audio/mpeg");
+    res.status(200).send(Buffer.from(dummyBotAudio[0], "base64"));
+    return;
+  }
+
   try {
     const response = await textToSpeech(message);
     const audioContent = response.audioContent;
 
     res.setHeader("Content-Type", "audio/mpeg");
-    res.setHeader("Content-Disposition", "attachment; filename=hello-world.mp3");
+
+    // Use the following to print the audio content to the console. Yeeeee
+    //console.log("suppp\n\n\n", audioContent);
+
     res.status(200).send(Buffer.from(audioContent, "base64"));
   } catch (err) {
     console.error(err);

@@ -5177,6 +5177,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/lodash@npm:^4.14.192":
+  version: 4.14.192
+  resolution: "@types/lodash@npm:4.14.192"
+  checksum: 31e1f0543a04158d2c429c45efd7c77882736630d0652f82eb337d6159ec0c249c5d175c0af731537b53271e665ff8d76f43221d75d03646d31cb4bd6f0056b1
+  languageName: node
+  linkType: hard
+
 "@types/long@npm:^4.0.0, @types/long@npm:^4.0.1":
   version: 4.0.2
   resolution: "@types/long@npm:4.0.2"
@@ -13584,6 +13591,7 @@ __metadata:
     "@tamagui/next-theme": 1.7.8
     "@tanstack/react-query": ^4.28.0
     "@types/jest": ^29.5.0
+    "@types/lodash": ^4.14.192
     "@types/node": ^18.6.4
     app: "*"
     babylonjs: ^5.46.0

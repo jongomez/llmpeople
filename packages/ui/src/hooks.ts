@@ -18,7 +18,7 @@ dummyMessages = [{ role: "assistant", content: "Hey, how's it going?" }];
 
 export type ChatHookState = {
   messages: ChatMessage[];
-  loadingMessage: boolean;
+  isStreamingMessage: boolean;
   errorMessage: string;
   charCount: number;
 };
@@ -28,7 +28,6 @@ export type ChatHookReturnType = {
   setChatState: React.Dispatch<React.SetStateAction<ChatHookState>>;
   textAreaRef: React.RefObject<ReactNativeTextInput>;
   messagesContainerRef: React.RefObject<MessagesContainerRef>;
-  audioRef: React.RefObject<HTMLAudioElement | null>;
   appendBotMessage: (botMessage: ChatMessage, isStreamUpdate: boolean) => void;
   appendUserMessage: (userMessage: string) => ChatMessage[];
 };
@@ -36,12 +35,11 @@ export type ChatHookReturnType = {
 export const useChat = (): ChatHookReturnType => {
   const textAreaRef = useRef<ReactNativeTextInput>(null);
   const messagesContainerRef = useRef<MessagesContainerRef>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [chatState, setChatState] = useState<ChatHookState>({
     charCount: 0,
     errorMessage: "",
     messages: dummyMessages,
-    loadingMessage: false,
+    isStreamingMessage: false,
   });
 
   // Appends message from the bot to the messages state array. This will update the chat's text area.
@@ -103,7 +101,6 @@ export const useChat = (): ChatHookReturnType => {
     setChatState,
     textAreaRef,
     messagesContainerRef,
-    audioRef,
     appendBotMessage,
     appendUserMessage,
   };

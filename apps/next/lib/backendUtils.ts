@@ -94,3 +94,34 @@ export async function OpenAIStream(payload: OpenAIStreamPayload) {
 
   return stream;
 }
+
+//
+////
+////// For testing purposes.
+
+export function recursiveStreamEnqueue(
+  controller: ReadableStreamDefaultController<any>,
+  messageTokens: string[],
+  index: number,
+  timeBetweenTokens = 100
+) {
+  if (index >= messageTokens.length) {
+    controller.close();
+    return;
+  }
+
+  setTimeout(function () {
+    console.log(messageTokens[index]);
+    var enc = new TextEncoder();
+    controller.enqueue(enc.encode(messageTokens[index] + " "));
+    recursiveStreamEnqueue(controller, messageTokens, ++index);
+  }, timeBetweenTokens);
+}
+
+export function streamMock(messageTokens: string[]): ReadableStream {
+  return new ReadableStream({
+    start(controller) {
+      recursiveStreamEnqueue(controller, messageTokens, 0);
+    },
+  });
+}

@@ -1,11 +1,18 @@
 import { useLayoutEffect, useState } from "react";
 import { Anchor, Button, Text, XStack } from "tamagui";
-import { useGameContext } from "./GameContextProvider";
+import { GameContext } from "./GameContextProvider";
 
-interface PrivacyPolicyProps {}
+type PrivacyPolicyProps = {
+  hasAcceptedPrivacyPolicy: boolean;
+  acceptPrivacyPolicy: GameContext["acceptPrivacyPolicy"];
+  onAnchorPress: () => void;
+};
 
-export const PrivacyPolicy: React.FC<PrivacyPolicyProps> = () => {
-  const { acceptPrivacyPolicy, hasAcceptedPrivacyPolicy } = useGameContext();
+export const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({
+  acceptPrivacyPolicy,
+  hasAcceptedPrivacyPolicy,
+  onAnchorPress,
+}) => {
   const lineHeight = 20;
   const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
 
@@ -17,11 +24,13 @@ export const PrivacyPolicy: React.FC<PrivacyPolicyProps> = () => {
   return (
     <XStack
       position={"absolute"}
-      bottom={12}
+      bottom={30}
       left={0}
       right={0}
       jc="center"
       display={showPrivacyPolicy ? "flex" : "none"}
+      mx={10}
+      zIndex={100}
     >
       <XStack
         borderWidth={1}
@@ -35,18 +44,12 @@ export const PrivacyPolicy: React.FC<PrivacyPolicyProps> = () => {
       >
         <Text mr={12} textAlign="center" lineHeight={lineHeight}>
           This website uses the the OpenAI API. They collect data. Be sure to read and accept the{" "}
-          <Anchor
-            onPress={() => window.open("/about", "_blank")}
-            lineHeight={lineHeight}
-            color="#007bff"
-            cursor="pointer"
-          >
+          <Anchor onPress={onAnchorPress} lineHeight={lineHeight} color="#007bff" cursor="pointer">
             data processing policy.
           </Anchor>
         </Text>
         <Button
           onPress={() => acceptPrivacyPolicy()}
-          marginTop={10}
           backgroundColor="$blue10"
           color="white"
           hoverStyle={{ backgroundColor: "$blue8" }}

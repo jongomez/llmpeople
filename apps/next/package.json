@@ -31,6 +31,7 @@
   "devDependencies": {
     "@tamagui/next-plugin": "1.7.8",
     "@types/jest": "^29.5.0",
+    "@types/lodash": "^4.14.192",
     "@types/node": "^18.6.4",
     "babylonjs-inspector": "^5.49.0",
     "critters": "^0.0.16",

@@ -1,15 +1,26 @@
-import React, { ReactNode, createContext, useContext, useEffect, useState } from "react";
+import React, { ReactNode, createContext, useContext, useEffect, useRef, useState } from "react";
 
-interface GameContext {
+interface SoundController {
   isVolumeOn: boolean;
   toggleVolume: () => void;
+  humanoidSound: React.MutableRefObject<HTMLAudioElement | null>;
+}
+export interface GameContext {
+  // Sound stuff:
+  soundController: SoundController;
+  // Privacy policy stuff:
   hasAcceptedPrivacyPolicy: boolean;
   acceptPrivacyPolicy: () => void;
 }
 
 const defaultGameContext: GameContext = {
-  isVolumeOn: true,
-  toggleVolume: () => {},
+  // Sound stuff:
+  soundController: {
+    isVolumeOn: true,
+    toggleVolume: () => {},
+    humanoidSound: { current: null },
+  },
+  // Privacy policy stuff:
   hasAcceptedPrivacyPolicy: false,
   acceptPrivacyPolicy: () => {},
 };
@@ -30,6 +41,7 @@ interface GameContextProviderProps {
 
 const GameContextProvider: React.FC<GameContextProviderProps> = ({ children }) => {
   const [isVolumeOn, setIsVolumeOn] = useState(true);
+  const humanoidSound = useRef<HTMLAudioElement | null>(null);
   const [hasAcceptedPrivacyPolicy, setHasAcceptedPrivacyPolicy] = useState<boolean>(() => {
     if (typeof window === "undefined") {
       return false;
@@ -44,7 +56,13 @@ const GameContextProvider: React.FC<GameContextProviderProps> = ({ children }) =
   }, [hasAcceptedPrivacyPolicy]);
 
   const toggleVolume = () => {
-    setIsVolumeOn(!isVolumeOn);
+    const newIsVolumeOn = !isVolumeOn;
+
+    if (humanoidSound.current) {
+      humanoidSound.current.volume = newIsVolumeOn ? 1 : 0;
+    }
+
+    setIsVolumeOn(newIsVolumeOn);
   };
 
   const acceptPrivacyPolicy = () => {
@@ -52,8 +70,11 @@ const GameContextProvider: React.FC<GameContextProviderProps> = ({ children }) =
   };
 
   const value = {
-    isVolumeOn,
-    toggleVolume,
+    soundController: {
+      humanoidSound,
+      isVolumeOn,
+      toggleVolume,
+    },
     hasAcceptedPrivacyPolicy,
     acceptPrivacyPolicy,
   };

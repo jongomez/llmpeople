@@ -1,16 +1,12 @@
 import { ArcRotateCamera, AxesViewer, Scene, Vector3 } from "babylonjs";
 import { v3 } from "./utils";
 
-const setAxisViewer = (
-  camera: ArcRotateCamera,
-  position: Vector3,
-  axesViewer: AxesViewer,
-) => {
+const setAxisViewer = (camera: ArcRotateCamera, position: Vector3, axesViewer: AxesViewer) => {
   axesViewer.update(
     position,
     camera.getDirection(v3(1, 0, 0)),
     camera.getDirection(v3(0, 1, 0)),
-    camera.getDirection(v3(0, 0, 1)),
+    camera.getDirection(v3(0, 0, 1))
   );
 };
 
@@ -19,25 +15,16 @@ type AxesViewerAndAxesCamera = {
   axesCamera: ArcRotateCamera;
 };
 
-const createAxesViewerAndAxesCamera = (
-  scene: Scene,
-): AxesViewerAndAxesCamera => {
+const createAxesViewerAndAxesCamera = (scene: Scene): AxesViewerAndAxesCamera => {
   const axesViewer = new AxesViewer(scene, 2);
-  var axesCamera = new ArcRotateCamera(
-    "AxesCamera",
-    Math.PI / 2,
-    0,
-    8,
-    v3(),
-    scene,
-  );
+  var axesCamera = new ArcRotateCamera("AxesCamera", Math.PI / 2, 0, 8, v3(), scene);
 
   const axesCameraViewportSize = 0.15;
   axesCamera.viewport = new BABYLON.Viewport(
     1 - axesCameraViewportSize,
     0,
     axesCameraViewportSize,
-    axesCameraViewportSize,
+    axesCameraViewportSize
   );
 
   axesViewer.xAxis.getChildMeshes().forEach((mesh) => {
@@ -57,12 +44,19 @@ const createAxesViewerAndAxesCamera = (
 };
 
 export const createCamera = (scene: Scene): ArcRotateCamera => {
-  const camera = new ArcRotateCamera("MainCamera", -Math.PI / 2, Math.PI/2 , 3, v3(0, .7, 0), scene);
+  const camera = new ArcRotateCamera(
+    "MainCamera",
+    -Math.PI / 2,
+    Math.PI / 2.5,
+    2.5,
+    v3(0, 0.7, 0),
+    scene
+  );
   camera.lowerRadiusLimit = 2;
   camera.upperRadiusLimit = 7;
-  camera.upperBetaLimit = Math.PI/1.5;
+  camera.upperBetaLimit = Math.PI / 1.5;
 
-  camera.wheelPrecision = 20
+  camera.wheelPrecision = 20;
 
   return camera;
 };

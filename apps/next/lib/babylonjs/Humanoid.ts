@@ -5,18 +5,27 @@ import {
   Debug,
   Mesh,
   MorphTarget,
+  PBRMaterial,
   Scene,
   SceneLoader,
   Skeleton,
   Vector3,
 } from "babylonjs";
-import { random } from "lodash";
+import { random, sample } from "lodash";
 import { playMorphTargetAnim } from "./utils";
 
 type MyMesh = AbstractMesh | Mesh;
-export default class Humanoid {
+
+type Anims =
+  | "idle1"
+  | "idle2"
+  | "idle3_hand_hips"
+  | "talking1"
+  | "talking2_head_shake"
+  | "talking3";
+export class Humanoid {
   name: string = "";
-  skeleton: Skeleton = null;
+  skeleton: Skeleton | null = null;
   morphTargetNames: string[] = [
     "Face.M_F00_000_00_Fcl_ALL_Neutral",
     "Face.M_F00_000_00_Fcl_ALL_Angry",
@@ -76,14 +85,14 @@ export default class Humanoid {
     "EyeExtra_01.M_F00_000_00_EyeExtra_On",
   ];
   intervalId: number = 0;
-  mainMesh: AbstractMesh | Mesh = null;
+  mainMesh: AbstractMesh | Mesh | null = null;
   meshes: MyMesh[] = [];
-  trackingBone: Bone = null;
+  trackingBone: Bone | null = null;
   ellipsoid = null; // FOR DEBUGGING: show the ellipsoid used for the cc.
   loaded = false;
   currentAnimationName: string = "";
   skeletonViewer: any = {};
-  faceMesh: Mesh = null;
+  faceMesh: Mesh | null = null;
   blinkingInfluence: number = 0;
   isBlinkingLeftEye = false;
   isBlinkingRightEye = false;
@@ -94,7 +103,7 @@ export default class Humanoid {
     private meshFileName: string,
     private modelName: any,
     private scene: Scene,
-    private startAnim: string,
+    private startAnim: Anims,
     private callback: () => void,
     private activate = true,
     private DEBUG = false
@@ -103,70 +112,66 @@ export default class Humanoid {
     this.intervalId = window.setInterval(this.afterImport.bind(this), 300);
 
     // (childMeshes, particleSystems, skeletons) => {
-    SceneLoader.ImportMeshAsync(
-      "",
-      "models/Model3_9.babylon",
-      "",
-      this.scene,
-      null
-    ).then((res) => {
-      this.skeleton = res.skeletons[0];
-      this.meshes = res.meshes;
-      this.mainMesh = res.meshes[0];
-      this.setFaceMesh();
+    SceneLoader.ImportMeshAsync("", "models/" + this.modelName, "", this.scene, null).then(
+      (res) => {
+        this.skeleton = res.skeletons[0];
+        this.meshes = res.meshes;
+        this.mainMesh = res.meshes[0];
+        this.setFaceMesh();
 
-      for (const mesh of res.meshes) {
-        mesh.position.y += this.yOffset;
-        mesh.alwaysSelectAsActiveMesh = true;
+        for (const mesh of res.meshes) {
+          mesh.position.y += this.yOffset;
+          mesh.alwaysSelectAsActiveMesh = true;
 
-        // Only show when all meshes are rendered. This is an alternative to scene.executeWhenReady
-        // HACK! Way of hiding the mesh that actually renders the mesh (doing .isVisible = false will not render the mesh)
-        // mesh.position.z = 1000;
-        // (mesh as Mesh).onAfterRenderObservable.addOnce((renderedMesh) => {
-        //   this.renderedMeshes.add(renderedMesh.name);
-        // });
+          // Only show when all meshes are rendered. This is an alternative to scene.executeWhenReady
+          // HACK! Way of hiding the mesh that actually renders the mesh (doing .isVisible = false will not render the mesh)
+          // mesh.position.z = 1000;
+          // (mesh as Mesh).onAfterRenderObservable.addOnce((renderedMesh) => {
+          //   this.renderedMeshes.add(renderedMesh.name);
+          // });
+        }
+
+        this.mainMesh.skeleton = this.skeleton;
+
+        // Improves performance when we're picking stuff with rays. Also, this doesn't work (meshes deformed with rigs are on GPU, picking is done with CPU).
+        // In order to pick the mesh, we'll use the this.colliders boxes.
+        this.mainMesh.isPickable = false;
+        // XXX: If this is false, how come cc collides the mesh with the ground??? BECAUSE it sets an ellipsoid, and calls moveWithCollision().
+        // ... so no need for checkCollisions to be true.
+        this.mainMesh.checkCollisions = false;
+
+        this.mainMesh.receiveShadows = false;
+
+        this.setAnim(this.startAnim);
+
+        // Rotate the character, so the z axis is pointing forward.
+        this.mainMesh.rotation.y = Math.PI;
+
+        if (!this.activate) this.mainMesh.setEnabled(false);
+
+        // Handle mesh shadows, backface culling, etc.
+        // this.childMeshes = childMeshes
+        // this.processChildMeshes()
+
+        if (this.DEBUG) this.DEBUGSTUFF();
       }
-
-      this.mainMesh.skeleton = this.skeleton;
-
-      // Improves performance when we're picking stuff with rays. Also, this doesn't work (meshes deformed with rigs are on GPU, picking is done with CPU).
-      // In order to pick the mesh, we'll use the this.colliders boxes.
-      this.mainMesh.isPickable = false;
-      // XXX: If this is false, how come cc collides the mesh with the ground??? BECAUSE it sets an ellipsoid, and calls moveWithCollision().
-      // ... so no need for checkCollisions to be true.
-      this.mainMesh.checkCollisions = false;
-
-      this.mainMesh.receiveShadows = false;
-
-      this.setAnim(this.startAnim);
-
-      // Rotate the character, so the z axis is pointing forward.
-      this.mainMesh.rotation.y = Math.PI;
-
-      if (!this.activate) this.mainMesh.setEnabled(false);
-
-      // Handle mesh shadows, backface culling, etc.
-      // this.childMeshes = childMeshes
-      // this.processChildMeshes()
-
-      if (this.DEBUG) this.DEBUGSTUFF();
-    });
+    );
   }
 
   hide() {
-    this.mainMesh.setEnabled(false);
+    this.mainMesh?.setEnabled(false);
   }
 
   show() {
-    this.mainMesh.setEnabled(true);
+    this.mainMesh?.setEnabled(true);
   }
 
   // XXX: This is probably not necessary... but okay.
-  playAnimation(animationName, loop) {
+  playAnimation(animationName: string, loop: boolean) {
     // let animationRange = this.skeleton.getAnimationRange(animationName);
     // this.scene.beginAnimation(this.skeleton, from, to, loop, 1);
 
-    this.skeleton.beginAnimation(animationName, loop);
+    this.skeleton?.beginAnimation(animationName, loop);
   }
 
   // Call this function OUTSIDE of the ImportMesh callback. Otherwise console errors will just say "error on ImportMesh".
@@ -200,11 +205,12 @@ export default class Humanoid {
 
       window.setTimeout(() => this.blink(), 2000);
 
-      this.talk();
+      // Debug the talking animations.
+      // this.talkAnimationStart();
     }
   }
 
-  processMaterial(material) {
+  processMaterial(material: PBRMaterial) {
     material.specularIntensity = 0;
     material.metallicF0Factor = 0;
     // 0.4 is a truly magical value. It removes the weird black shapes in the characters.
@@ -217,30 +223,46 @@ export default class Humanoid {
     this.updateEllipsoid(new Vector3(0.15, 1, 0.15), new Vector3(0, 1, 0.1));
   }
 
-  updateEllipsoid(diameter, offset) {
-    this.mainMesh.ellipsoid = diameter;
-    this.mainMesh.ellipsoidOffset = offset;
-    //this.mainMesh.refreshBoundingInfo();
+  updateEllipsoid(diameter: Vector3, offset: Vector3) {
+    if (this.mainMesh) {
+      this.mainMesh.ellipsoid = diameter;
+      this.mainMesh.ellipsoidOffset = offset;
+      //this.mainMesh.refreshBoundingInfo();
+    }
   }
 
-  copyPropsToOtherHumanoid(otherHumanoid) {
-    otherHumanoid.mainMesh.position = this.mainMesh.position.clone();
+  copyPropsToOtherHumanoid(otherHumanoid: Humanoid) {
+    if (otherHumanoid.mainMesh && this.mainMesh) {
+      otherHumanoid.mainMesh.position = this.mainMesh.position.clone();
+    }
   }
 
   // Can be a pose, or anim, or a frame. (a pose is an anim with only 1 frame I guess)
   // Why use animName, if we could just pass in the frame??? Because skeleton.beginAnimation uses the animName to begin. IT'S EASIER.
-  setAnim(animName, poseFrame = -1, starPaused = false) {
+  setAnim(animName: Anims, poseFrame = -1, starPaused = false) {
+    if (!this.skeleton) {
+      return;
+    }
+
     const startSpeedRatio = 1;
 
     // Don't remember why I added this here :shrug:
     //this.disableSkeletonBlending();
 
-    let animatable = this.skeleton.beginAnimation(
-      animName,
-      true,
-      startSpeedRatio
-    );
+    console.log("skeleton animation names:", this.skeleton.getAnimationRanges());
+
+    let animatable = this.skeleton.beginAnimation(animName, true, startSpeedRatio);
     let animRange = this.skeleton.getAnimationRange(animName);
+
+    if (!animRange) {
+      console.error("animRange is null :(");
+      return;
+    }
+
+    if (!animatable) {
+      console.error("animatable is null :(");
+      return;
+    }
 
     if (poseFrame == -1) poseFrame = animRange.from;
 
@@ -250,11 +272,11 @@ export default class Humanoid {
       animatable.pause();
     }
 
-    this.skeleton.enableBlending(1);
+    this.skeleton.enableBlending(0.05);
   }
 
   disableSkeletonBlending() {
-    this.skeleton.bones.forEach(function (bone) {
+    this.skeleton?.bones.forEach(function (bone) {
       bone.animations.forEach(function (animation) {
         animation.enableBlending = false;
       });
@@ -262,6 +284,11 @@ export default class Humanoid {
   }
 
   getMorphTargetByName(morphTargetName: string): MorphTarget | null {
+    if (!this.faceMesh?.morphTargetManager) {
+      console.error("faceMesh is null or does not have a morphTargetManager :(");
+      return null;
+    }
+
     const morphTargetIndex = this.morphTargetNames.indexOf(morphTargetName);
 
     if (morphTargetIndex === -1) {
@@ -294,12 +321,12 @@ export default class Humanoid {
     const blinkOpenTimeSeconds = 0.15;
     const blinkCloseTimeSeconds = 0.2;
 
-    const leftEyeCloseTarget = this.getMorphTargetByName(
-      "Face.M_F00_000_00_Fcl_EYE_Close_L"
-    );
-    const rightEyeCloseTarget = this.getMorphTargetByName(
-      "Face.M_F00_000_00_Fcl_EYE_Close_R"
-    );
+    const leftEyeCloseTarget = this.getMorphTargetByName("Face.M_F00_000_00_Fcl_EYE_Close_L");
+    const rightEyeCloseTarget = this.getMorphTargetByName("Face.M_F00_000_00_Fcl_EYE_Close_R");
+
+    if (!leftEyeCloseTarget || !rightEyeCloseTarget) {
+      return;
+    }
 
     this.isBlinkingRightEye = true;
     this.isBlinkingLeftEye = true;
@@ -336,7 +363,22 @@ export default class Humanoid {
     );
   }
 
-  talk() {
+  talkAnimationEnd() {
+    //console.log("talkAnimationEnd - this.isTalking", this.isTalking);
+
+    if (!this.isTalking) {
+      return;
+    }
+
+    this.isTalking = false;
+
+    // NOTE: idle1 also exists, but it's not very good.
+    const idleAnims: Anims[] = ["idle3_hand_hips", "idle2"];
+    // NOTE: The | "idle3_hand_hips" is there only to make TypeScript happy.
+    this.setAnim(sample(idleAnims) || "idle3_hand_hips");
+  }
+
+  talkAnimationStart() {
     if (this.isTalking) {
       return;
     }
@@ -350,9 +392,28 @@ export default class Humanoid {
     // const oTarget = this.getMorphTargetByName("Face.M_F00_000_00_Fcl_MTH_O");
     // const uTarget = this.getMorphTargetByName("Face.M_F00_000_00_Fcl_MTH_U");
 
+    if (!aTarget) {
+      return;
+    }
+
+    const talkingAnims: Anims[] = ["talking1", "talking2_head_shake", "talking3"];
+    //const talkingAnims: Anims[] = ["talking1", "talking3"];
+
+    // NOTE: The | "talking3" is there only to make TypeScript happy.
+    this.setAnim(sample(talkingAnims) || "talking3");
+
     //const allVowelTargets = [aTarget, eTarget, iTarget, oTarget, uTarget];
 
+    // Recursive thingy - when the animation ends, it calls itself again.
     const vowelAnimEnd = () => {
+      // console.log("vowelAnimEnd - this.isTalking", this.isTalking);
+
+      // XXX: This value probably comes from a closure, so it's probably not up to date???
+      // Although if this is an object, it should be a reference, so it should be up to date?
+      if (!this.isTalking) {
+        return;
+      }
+
       playMorphTargetAnim(
         "aSoundAnim",
         [0, random(minTime, maxTime), random(minTime, maxTime)],
@@ -376,6 +437,16 @@ export default class Humanoid {
 
   DEBUGSTUFF() {
     if (this.skeletonViewer == null) {
+      if (this.skeleton == null) {
+        console.error("skeleton is null :(");
+        return;
+      }
+
+      if (this.mainMesh == null) {
+        console.error("mainMesh is null :(");
+        return;
+      }
+
       // 1st call:
 
       // DEBUG
@@ -389,11 +460,7 @@ export default class Humanoid {
       //var LBreastAxesViewer = new Debug.BoneAxesViewer(scene, LBreastBoneTipObject, mainMesh);
       //var RBreastAxesViewer = new Debug.BoneAxesViewer(scene, RBreastBone, mainMesh);
 
-      this.skeletonViewer = new Debug.SkeletonViewer(
-        this.skeleton,
-        this.mainMesh,
-        this.scene
-      );
+      this.skeletonViewer = new Debug.SkeletonViewer(this.skeleton, this.mainMesh, this.scene);
       this.skeletonViewer.isEnabled = true;
       this.skeletonViewer.color = Color3.White();
     } else {

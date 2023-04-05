@@ -1,22 +1,26 @@
-import { Chat, Loading, PrivacyPolicy, Volume } from "@my/ui/src";
+import { AboutDialog, Chat, Loading, PrivacyPolicy, Volume } from "@my/ui/src";
+import { useGameContext } from "@my/ui/src/GameContextProvider";
 import { WebGLNotSupported } from "components/WebGLErrors";
+import { Humanoid } from "lib/babylonjs/Humanoid";
 import { initBabylon } from "lib/babylonjs/init";
 import { isBabylonInspectorShowing } from "lib/utils";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 let didInit = false;
 
 // XXX: Setting the following to "false" helps when developing UI stuff. Because the canvas is not rendered, the UI is much faster to develop.
-const showCanvas = true;
+const showCanvas = false;
 
-interface CanvasThatDoesNotReRenderProps {
+export interface CanvasThatDoesNotReRenderProps {
   setInitErrorMessage: (initErrorMessage: string) => void;
   setIsLoading: (isLoading: boolean) => void;
+  humanoidRef: React.MutableRefObject<Humanoid | null>;
 }
 
 const CanvasThatDoesNotReRender = React.memo(function CanvasThatDoesNotReRender({
   setInitErrorMessage,
   setIsLoading,
+  humanoidRef,
 }: CanvasThatDoesNotReRenderProps) {
   useEffect(() => {
     if (didInit) {
@@ -25,14 +29,14 @@ const CanvasThatDoesNotReRender = React.memo(function CanvasThatDoesNotReRender(
       return;
     }
 
-    const errorMessage = initBabylon(setIsLoading);
+    const errorMessage = initBabylon(setIsLoading, humanoidRef);
 
     if (errorMessage) {
       setInitErrorMessage(errorMessage);
     }
 
     didInit = true;
-  }, [setInitErrorMessage, setIsLoading]);
+  }, [setInitErrorMessage, setIsLoading, humanoidRef]);
 
   return (
     <canvas
@@ -48,8 +52,9 @@ const CanvasThatDoesNotReRender = React.memo(function CanvasThatDoesNotReRender(
 export default function Game() {
   const [initErrorMessage, setInitErrorMessage] = useState<string>("");
   const [isLoading, setIsLoading] = useState(showCanvas);
-  const chatInputWidth = 300;
-  const chatInputHeight = 80;
+  const humanoidRef = useRef<Humanoid | null>(null);
+  const { soundController, acceptPrivacyPolicy, hasAcceptedPrivacyPolicy } = useGameContext();
+  const aboutDialogTriggerRef = useRef<HTMLButtonElement>(null);
 
   if (initErrorMessage.includes("WebGL not supported")) {
     return <WebGLNotSupported />;
@@ -80,19 +85,51 @@ export default function Game() {
       >
         {!isLoading && (
           <>
-            <Volume />
-            <PrivacyPolicy />
+            <AboutDialog aboutDialogTriggerRef={aboutDialogTriggerRef} />
+            <Volume soundController={soundController} />
+            <PrivacyPolicy
+              acceptPrivacyPolicy={acceptPrivacyPolicy}
+              hasAcceptedPrivacyPolicy={hasAcceptedPrivacyPolicy}
+              onAnchorPress={() => {
+                aboutDialogTriggerRef.current?.click();
+              }}
+            />
           </>
         )}
         {showCanvas && (
           <CanvasThatDoesNotReRender
             setIsLoading={setIsLoading}
             setInitErrorMessage={setInitErrorMessage}
+            humanoidRef={humanoidRef}
           />
         )}
         <Chat
           display={isLoading ? "none" : "flex"}
           right={isBabylonInspectorShowing() ? "300px" : "0px"}
+          audioReceivedCallback={(newAudio: HTMLAudioElement | null) => {
+            soundController.humanoidSound.current?.pause();
+
+            if (!newAudio) {
+              return;
+            }
+
+            if (!soundController.isVolumeOn) {
+              newAudio.volume = 0;
+            }
+
+            const onAudioEndOrPause = () => {
+              humanoidRef.current?.talkAnimationEnd();
+            };
+
+            newAudio.addEventListener("pause", onAudioEndOrPause);
+            newAudio.addEventListener("end", onAudioEndOrPause);
+
+            newAudio.play();
+
+            soundController.humanoidSound.current = newAudio;
+
+            humanoidRef.current?.talkAnimationStart();
+          }}
         />
       </div>
     </div>

@@ -1,11 +1,14 @@
 import { ChatMessage } from "@my/ui/types/Chat";
-import { OpenAIStream, OpenAIStreamPayload } from "lib/backendUtils";
+import { OpenAIStream, OpenAIStreamPayload, streamMock } from "lib/backendUtils";
+import { dummyBotMessages } from "lib/dummyResponses";
 
 const MAX_REQUEST_BODY_LENGTH = 1200;
 const MAX_WORD_SUGGESTION = 80;
 const prompt = `. Answer as a fun, upbeat female character. Responses have to be short. The maxiumum response length is ${MAX_WORD_SUGGESTION} words.`;
 
 // Pretty much a copy paste of: https://github.com/Nutlope/twitterbio/
+
+const USE_DUMMY_MESSAGES = false;
 
 if (!process.env.OPENAI_API_KEY) {
   throw new Error("Missing env var from OpenAI");
@@ -14,32 +17,6 @@ if (!process.env.OPENAI_API_KEY) {
 export const config = {
   runtime: "edge",
 };
-
-// For debugging purposes.
-let dummyReturnMessage: any = null;
-
-/*
-
-dummyReturnMessage = {
-  role: 'assistant',
-  content: '!\n' +
-    '\n' +
-    "As an AI language model, I don't have the physical appearance, existence of feelings or emotions. However, I'm happy to assist you with anything related to text generation, translation, summarization, and more. How can I assist you today?"
-}
-
-dummyReturnMessage = {
-  role: "assistant",
-  content:
-    "Sure, here are three possible reasons why people may bite their own tongue:\n" +
-    "\n" +
-    "1. Accidental biting: People may accidentally bite their own tongue while eating or while talking, especially if they speak with their mouth full or when their mouth is dry.\n" +
-    "\n" +
-    "2. Stress and anxiety: Some people may bite their tongue unconsciously when they are feeling stressed or anxious. This may be due to nervousness or tension that can manifest itself in different physical ways.\n" +
-    "\n" +
-    "3. Sleep disorders: Some sleep disorders such as sleep apnea or bruxism (setting teeth) can cause people to bite their own tongue during sleep. If someone bites their tongue frequently during sleep, it may be best to see a doctor or a sleep specialist for further evaluation.",
-};
-
-*/
 
 const handler = async (req: Request): Promise<Response> => {
   const requestBody = await req.text();
@@ -80,8 +57,17 @@ const handler = async (req: Request): Promise<Response> => {
     n: 1,
   };
 
-  if (dummyReturnMessage) {
-    return new Response(JSON.stringify(dummyReturnMessage));
+  if (USE_DUMMY_MESSAGES) {
+    const STREAM = true;
+    const message = dummyBotMessages[1];
+
+    if (STREAM) {
+      const readable = streamMock(message.split(" "));
+
+      return new Response(readable);
+    } else {
+      return new Response(message);
+    }
   }
 
   try {
