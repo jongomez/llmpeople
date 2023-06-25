@@ -1,34 +1,9 @@
-import type { ChatGPTMessage } from "@my/ui/src/Chat";
+import { ChatMessage } from "@my/ui/types/Chat";
 import { createParser, ParsedEvent, ReconnectInterval } from "eventsource-parser";
-
-/*
-
-export const cleanOpenAIMessage = (message?: string): string => {
-  if (!message) {
-    return "";
-  }
-
-  console.log("Cleaning message:", message);
-
-  // Removes newlines from the start and ending of the string.
-  const trimmedMessage = message.trim();
-
-  // Removes ponctuation from the start of the string.
-  const messageWithoutPonctuation = trimmedMessage.replace(/^[.,\/#!$%\^&\*;:{}=\-_`~()]/, "");
-
-  // Removes newlines from the start and ending of the string. Again.
-  const secondTrimmedMessage = messageWithoutPonctuation.trim();
-
-  console.log("Cleaned message:", secondTrimmedMessage);
-
-  return secondTrimmedMessage;
-};
-
-*/
 
 export type OpenAIStreamPayload = {
   model: string;
-  messages: ChatGPTMessage[];
+  messages: ChatMessage[];
   temperature: number;
   top_p: number;
   frequency_penalty: number;
@@ -125,22 +100,6 @@ export function streamMock(messageTokens: string[]): ReadableStream {
     },
   });
 }
-
-/*
-
-if (!process.env.GOOGLE_PRIVATE_KEY) {
-  throw new Error("GOOGLE_PRIVATE_KEY not found in the environment");
-}
-
-const client = new TextToSpeechClient({
-  projectId: process.env.GOOGLE_PROJECT_ID,
-  credentials: {
-    private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
-    client_email: process.env.GOOGLE_CLIENT_EMAIL,
-  },
-});
-
-*/
 
 export async function synthesizeSpeech(text: string): Promise<string> {
   if (!process.env.GOOGLE_API_KEY) {

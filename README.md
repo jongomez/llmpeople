@@ -4,6 +4,10 @@ It was built with the [next+expo+solito starter template - check out their READM
 
 # HOW TO SET UP
 
+An OpenAI API key is required. Check out the OPENAI_API_KEY env var in the .env file.
+
+A Google Cloud API key is required. Check out the GOOGLE_API_KEY env var in the .env file.
+
 1. **Install npm** - [nvm](https://github.com/nvm-sh/nvm#installing-and-updating) and node version 18.14.2 are recommended (this is the LTS version as of June 25 2023)
 
 2. **Make sure npm is installed**. You can run `npm -v` to check if it's installed.
@@ -14,35 +18,13 @@ It was built with the [next+expo+solito starter template - check out their READM
 
 5. **Run the project** - Run `yarn web` in the root folder of this project.
 
-# Android & IOS
+# Android & iOS
 
-(TODO: Update this please)
+In the apps/expo directory there's code to run this project on Android and iOS. It's currently not working, and I have no plans to fix it atm.
 
-Type npx expo, it should ask you to install the expo CLI globally. Say yes.
+# Native & web env vars
 
-Follow the instructions in:
-
-https://docs.expo.dev/workflow/android-studio-emulator
-
-the .bashrc file (or .zshrc file) should be updated with the following (instead of what they say in that page)
-
-export ANDROID_HOME=$HOME/Android/Sdk
-export PATH=$PATH:$ANDROID_HOME/tools
-export PATH=$PATH:$ANDROID_HOME/platform-tools
-
-After creating a device, run it. If expo go is already installed on the emulator, we can just run it and enter the URL provided by
-
-yarn dev
-
-If expo go is not installed, we can install expo go and start the app with
-
-yarn native
-
-and selecting Android.
-
-# env vars
-
-- Env var work a little different than usual. See TAMAGUI_TARGET for an example
+- Setting up env vars for both native and web is a little different than usual. See TAMAGUI_TARGET for an example.
 
 # Jest
 
@@ -52,7 +34,7 @@ npx jest path/to/testFile.test.ts --watch
 
 e.g. go into the apps/next folder, and run:
 
-npx jest **tests**/messagesAPI.test.ts --watch
+npx jest lib/babylonjs/\_\_tests\_\_/utils.test.ts --watch
 
 # OTHER
 

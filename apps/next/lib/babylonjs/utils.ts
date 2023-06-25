@@ -11,9 +11,7 @@ export const v3 = (x: number = 0, y: number = 0, z: number = 0): Vector3 => {
   return new Vector3(x, y, z);
 };
 
-export const getMorphTargetNames = (
-  morphTargetManager: MorphTargetManager
-): string[] => {
+export const getMorphTargetNames = (morphTargetManager: MorphTargetManager): string[] => {
   const morphTargetNames: string[] = [];
 
   for (let i = 0; i < morphTargetManager.numTargets; i++) {
@@ -74,8 +72,12 @@ export const playMorphTargetAnim = (
     Animation.ANIMATIONTYPE_FLOAT
   );
   morphAnimation.setKeys(keyFrames);
-  morphTarget.animations = [];
-  morphTarget.animations.push(morphAnimation);
+
+  morphTarget.animations = [morphAnimation];
+
+  if (!lastFrame) {
+    throw new Error("lastFrame is undefined");
+  }
 
   scene.beginAnimation(morphTarget, 0, lastFrame.frame, false, 1, endCallback);
 };
