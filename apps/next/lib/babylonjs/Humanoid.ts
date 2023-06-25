@@ -12,6 +12,7 @@ import {
   Vector3,
 } from "babylonjs";
 import { random, sample } from "lodash";
+import myModel from "../models/Model3_11.json";
 import { playMorphTargetAnim } from "./utils";
 
 type MyMesh = AbstractMesh | Mesh;
@@ -98,6 +99,8 @@ export class Humanoid {
   isBlinkingRightEye = false;
   isTalking = false;
   yOffset = 0.1;
+  currentAnimName: Anims | "" = "";
+  previousAnimName: Anims | "" = "";
 
   constructor(
     private meshFileName: string,
@@ -111,51 +114,52 @@ export class Humanoid {
     this.name = this.meshFileName.split(".")[0];
     this.intervalId = window.setInterval(this.afterImport.bind(this), 300);
 
-    // (childMeshes, particleSystems, skeletons) => {
-    SceneLoader.ImportMeshAsync("", "models/" + this.modelName, "", this.scene, null).then(
-      (res) => {
-        this.skeleton = res.skeletons[0];
-        this.meshes = res.meshes;
-        this.mainMesh = res.meshes[0];
-        this.setFaceMesh();
+    const modelDataString = JSON.stringify(myModel);
+    const modelDataBase64 = btoa(modelDataString);
+    const modelDataURL = `data:application/json;base64,${modelDataBase64}`;
 
-        for (const mesh of res.meshes) {
-          mesh.position.y += this.yOffset;
-          mesh.alwaysSelectAsActiveMesh = true;
+    SceneLoader.ImportMeshAsync("", "/", modelDataURL, this.scene, null).then((res) => {
+      this.skeleton = res.skeletons[0];
+      this.meshes = res.meshes;
+      this.mainMesh = res.meshes[0];
+      this.setFaceMesh();
 
-          // Only show when all meshes are rendered. This is an alternative to scene.executeWhenReady
-          // HACK! Way of hiding the mesh that actually renders the mesh (doing .isVisible = false will not render the mesh)
-          // mesh.position.z = 1000;
-          // (mesh as Mesh).onAfterRenderObservable.addOnce((renderedMesh) => {
-          //   this.renderedMeshes.add(renderedMesh.name);
-          // });
-        }
+      for (const mesh of res.meshes) {
+        mesh.position.y += this.yOffset;
+        mesh.alwaysSelectAsActiveMesh = true;
 
-        this.mainMesh.skeleton = this.skeleton;
-
-        // Improves performance when we're picking stuff with rays. Also, this doesn't work (meshes deformed with rigs are on GPU, picking is done with CPU).
-        // In order to pick the mesh, we'll use the this.colliders boxes.
-        this.mainMesh.isPickable = false;
-        // XXX: If this is false, how come cc collides the mesh with the ground??? BECAUSE it sets an ellipsoid, and calls moveWithCollision().
-        // ... so no need for checkCollisions to be true.
-        this.mainMesh.checkCollisions = false;
-
-        this.mainMesh.receiveShadows = false;
-
-        this.setAnim(this.startAnim);
-
-        // Rotate the character, so the z axis is pointing forward.
-        this.mainMesh.rotation.y = Math.PI;
-
-        if (!this.activate) this.mainMesh.setEnabled(false);
-
-        // Handle mesh shadows, backface culling, etc.
-        // this.childMeshes = childMeshes
-        // this.processChildMeshes()
-
-        if (this.DEBUG) this.DEBUGSTUFF();
+        // Only show when all meshes are rendered. This is an alternative to scene.executeWhenReady
+        // HACK! Way of hiding the mesh that actually renders the mesh (doing .isVisible = false will not render the mesh)
+        // mesh.position.z = 1000;
+        // (mesh as Mesh).onAfterRenderObservable.addOnce((renderedMesh) => {
+        //   this.renderedMeshes.add(renderedMesh.name);
+        // });
       }
-    );
+
+      this.mainMesh.skeleton = this.skeleton;
+
+      // Improves performance when we're picking stuff with rays. Also, this doesn't work (meshes deformed with rigs are on GPU, picking is done with CPU).
+      // In order to pick the mesh, we'll use the this.colliders boxes.
+      this.mainMesh.isPickable = false;
+      // XXX: If this is false, how come cc collides the mesh with the ground??? BECAUSE it sets an ellipsoid, and calls moveWithCollision().
+      // ... so no need for checkCollisions to be true.
+      this.mainMesh.checkCollisions = false;
+
+      this.mainMesh.receiveShadows = false;
+
+      this.setAnim(this.startAnim);
+
+      // Rotate the character, so the z axis is pointing forward.
+      this.mainMesh.rotation.y = Math.PI;
+
+      if (!this.activate) this.mainMesh.setEnabled(false);
+
+      // Handle mesh shadows, backface culling, etc.
+      // this.childMeshes = childMeshes
+      // this.processChildMeshes()
+
+      if (this.DEBUG) this.DEBUGSTUFF();
+    });
   }
 
   hide() {
@@ -239,7 +243,7 @@ export class Humanoid {
 
   // Can be a pose, or anim, or a frame. (a pose is an anim with only 1 frame I guess)
   // Why use animName, if we could just pass in the frame??? Because skeleton.beginAnimation uses the animName to begin. IT'S EASIER.
-  setAnim(animName: Anims, poseFrame = -1, starPaused = false) {
+  setAnim(animName: Anims, poseFrame = -1, startPaused = false, onAnimationEnd?: () => void) {
     if (!this.skeleton) {
       return;
     }
@@ -249,9 +253,16 @@ export class Humanoid {
     // Don't remember why I added this here :shrug:
     //this.disableSkeletonBlending();
 
-    console.log("skeleton animation names:", this.skeleton.getAnimationRanges());
+    // console.log("skeleton animation names:", this.skeleton.getAnimationRanges());
 
-    let animatable = this.skeleton.beginAnimation(animName, true, startSpeedRatio);
+    // If there is a onAnimationEnd callback, then we DO NOT want to loop the current anim.
+    let animatable = this.skeleton.beginAnimation(
+      animName,
+      !onAnimationEnd,
+      startSpeedRatio,
+      onAnimationEnd
+    );
+
     let animRange = this.skeleton.getAnimationRange(animName);
 
     if (!animRange) {
@@ -264,13 +275,18 @@ export class Humanoid {
       return;
     }
 
+    // If no poseFrame was passed in (-1 is the default value), use the first frame of the anim.
     if (poseFrame == -1) poseFrame = animRange.from;
 
-    animatable.goToFrame(poseFrame);
+    // animatable.goToFrame(poseFrame);
 
-    if (starPaused) {
+    if (startPaused) {
       animatable.pause();
     }
+
+    // NOTE: previousAnimName and currentAnimName are not currently used.
+    this.previousAnimName = this.currentAnimName;
+    this.currentAnimName = animName;
 
     this.skeleton.enableBlending(0.05);
   }
@@ -363,8 +379,24 @@ export class Humanoid {
     );
   }
 
-  talkAnimationEnd() {
-    //console.log("talkAnimationEnd - this.isTalking", this.isTalking);
+  getRandomIdleAnim(): Anims {
+    // NOTE: idle1 also exists, but it's not very good.
+    const idleAnims: Anims[] = ["idle3_hand_hips", "idle2"];
+
+    // NOTE: The | "idle3_hand_hips" is there only to make TypeScript happy.
+    return sample(idleAnims) || "idle3_hand_hips";
+  }
+
+  getRandomTalkingAnim(): Anims {
+    //const talkingAnims: Anims[] = ["talking1", "talking3"];
+    const talkingAnims: Anims[] = ["talking1", "talking2_head_shake", "talking3"];
+
+    // NOTE: The | "talking3" is there only to make TypeScript happy.
+    return sample(talkingAnims) || "talking3";
+  }
+
+  talkAnimationEnd(info: string, playRandomIdleAnim = true) {
+    // console.log("talkAnimationEnd - this.isTalking", this.isTalking, info);
 
     if (!this.isTalking) {
       return;
@@ -372,16 +404,21 @@ export class Humanoid {
 
     this.isTalking = false;
 
-    // NOTE: idle1 also exists, but it's not very good.
-    const idleAnims: Anims[] = ["idle3_hand_hips", "idle2"];
-    // NOTE: The | "idle3_hand_hips" is there only to make TypeScript happy.
-    this.setAnim(sample(idleAnims) || "idle3_hand_hips");
+    if (playRandomIdleAnim) {
+      this.setAnim(this.getRandomIdleAnim());
+    }
   }
 
   talkAnimationStart() {
+    // console.log("talkAnimationStart - this.isTalking", this.isTalking);
+
     if (this.isTalking) {
       return;
     }
+
+    //
+    ////
+    ////// Play talking facial animation.
 
     const maxTime = 0.5;
     const minTime = 0.2;
@@ -395,12 +432,6 @@ export class Humanoid {
     if (!aTarget) {
       return;
     }
-
-    const talkingAnims: Anims[] = ["talking1", "talking2_head_shake", "talking3"];
-    //const talkingAnims: Anims[] = ["talking1", "talking3"];
-
-    // NOTE: The | "talking3" is there only to make TypeScript happy.
-    this.setAnim(sample(talkingAnims) || "talking3");
 
     //const allVowelTargets = [aTarget, eTarget, iTarget, oTarget, uTarget];
 
@@ -424,7 +455,6 @@ export class Humanoid {
       );
     };
 
-    this.isTalking = true;
     playMorphTargetAnim(
       "aSoundAnim",
       [0, random(minTime, maxTime), random(minTime, maxTime)],
@@ -433,6 +463,26 @@ export class Humanoid {
       vowelAnimEnd,
       this.scene
     );
+
+    this.isTalking = true;
+
+    //
+    ////
+    ////// Play talking body animation.
+
+    // this.setAnim(sample(talkingAnims) || "talking3");
+    const alternateBetweenAnims = (currentAnim: Anims, nextAnim: Anims) => {
+      // console.log("alternateBetweenAnims - this.isTalking", this.isTalking);
+      if (!this.isTalking) {
+        return;
+      }
+
+      this.setAnim(currentAnim, -1, false, () => {
+        alternateBetweenAnims(nextAnim, currentAnim);
+      });
+    };
+
+    alternateBetweenAnims(this.getRandomTalkingAnim(), this.currentAnimName || "idle3_hand_hips");
   }
 
   DEBUGSTUFF() {

@@ -42,6 +42,8 @@ export async function textToSpeech(message: string): Promise<TextToSpeechRespons
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  res.status(400).send(`What's up?`);
+
   if (req.method !== "POST") {
     res.status(405).end(); // Method Not Allowed
     return;
@@ -66,7 +68,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     res.setHeader("Content-Type", "audio/mpeg");
 
-    // Use the following to print the audio content to the console. Yeeeee
+    // Use the following to print the audio content to the console.
     //console.log("suppp\n\n\n", audioContent);
 
     res.status(200).send(Buffer.from(audioContent, "base64"));

@@ -9,7 +9,7 @@ import React, { useEffect, useRef, useState } from "react";
 let didInit = false;
 
 // XXX: Setting the following to "false" helps when developing UI stuff. Because the canvas is not rendered, the UI is much faster to develop.
-const showCanvas = false;
+const showCanvas = true;
 
 export interface CanvasThatDoesNotReRenderProps {
   setInitErrorMessage: (initErrorMessage: string) => void;
@@ -108,6 +108,7 @@ export default function Game() {
           right={isBabylonInspectorShowing() ? "300px" : "0px"}
           audioReceivedCallback={(newAudio: HTMLAudioElement | null) => {
             soundController.humanoidSound.current?.pause();
+            humanoidRef.current?.talkAnimationEnd("Received new audio");
 
             if (!newAudio) {
               return;
@@ -117,12 +118,13 @@ export default function Game() {
               newAudio.volume = 0;
             }
 
-            const onAudioEndOrPause = () => {
-              humanoidRef.current?.talkAnimationEnd();
+            const onAudioEnd = () => {
+              humanoidRef.current?.talkAnimationEnd("onAudioEnd");
             };
 
-            newAudio.addEventListener("pause", onAudioEndOrPause);
-            newAudio.addEventListener("end", onAudioEndOrPause);
+            // XXX: pause event is emitted after the pause() method is called or BEFORE an ended or seeking event
+            // newAudio.addEventListener("pause", onAudioEnd);
+            newAudio.addEventListener("ended", onAudioEnd);
 
             newAudio.play();
 

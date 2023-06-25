@@ -1,5 +1,5 @@
 import { describe, expect, it } from "@jest/globals";
-import { cleanOpenAIMessage } from "../pages/api/chat";
+import { cleanOpenAIMessage } from "../pages/api/chat_streaming";
 // TODO: Fix the above import.
 
 const crazyOpenAIResponse1 =

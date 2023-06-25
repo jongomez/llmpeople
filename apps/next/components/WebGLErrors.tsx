@@ -33,15 +33,13 @@ export function WebGLNotSupported({}: WebGLNotSupportedProps) {
       <h1 style={styles.textHeader}>WebGL not supported :(</h1>
       <p style={styles.textParagraph}>WebGL is necessary to play this game.</p>
       <h1 style={styles.textHeader}>How can I fix this?</h1>
+      <p style={styles.textParagraph}>It&apos;s hard to pinpoint an exact cause and fix.</p>
       <p style={styles.textParagraph}>
-        It's hard to pinpoint an exact cause and fix.
-      </p>
-      <p style={styles.textParagraph}>
-        My suggestion would be to search online for "How to enable webgl in "
-        followed by the device and/or browser you're using.
+        My suggestion would be to search online for &quot;How to enable webgl in &quot; followed by
+        the device and/or browser you&apos;re using.
       </p>
       <p style={{ textAlign: "center" }}>
-        For example: "How to enable webgl in iphone safari"
+        For example: &quot;How to enable webgl in iphone safari&quot;
       </p>
       {/* <h1 style={styles.textHeader}>Good luck {"\uD83D\uDCAA"}</h1> */}
     </div>

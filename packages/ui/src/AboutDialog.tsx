@@ -7,6 +7,7 @@ const AboutText = styled(Text, {
   name: "AboutText",
   lineHeight,
   marginBottom: 10,
+  display: "block",
 });
 
 const AboutAnchor = styled(Anchor, {
@@ -18,6 +19,7 @@ const AboutH2 = styled(H2, {
   name: "AboutH2",
   marginTop: 20,
   marginBottom: 10,
+  display: "block",
 });
 
 function About() {
@@ -40,15 +42,18 @@ function About() {
         </AboutAnchor>
       </AboutText>
       <AboutText>
-        This website does not collect any data. This means none of the information sent to OpenAI or
-        Google is stored by gpthangout. The same goes for any data received from these APIs.
+        No data is collected by the gpthangout servers. This means none of the information sent to
+        OpenAI or Google is stored by gpthangout. The same goes for any data received from these
+        APIs.
       </AboutText>
 
       <AboutH2>About</AboutH2>
+
       <AboutText>
-        Hello! I'm a software developer from Portugal. I started this project because I'm currently
-        looking for a new job, and wanted something else to do besides sending resumes and grinding
-        leetcode. More updates to come!
+        This is a personal project I made just for fun - it's 100% free and open source.
+        <AboutAnchor href="https://github.com/jongomez/gpthangout" target="_blank">
+          Check out the source code on github.
+        </AboutAnchor>
       </AboutText>
 
       <AboutH2>Contact</AboutH2>

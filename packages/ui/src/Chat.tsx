@@ -12,7 +12,6 @@ import {
   useMedia,
 } from "tamagui";
 import { ChatErrors } from "./ChatErrors";
-import { fetchAudio } from "./helpers";
 import { ChatHookReturnType, useChat } from "./hooks";
 
 const OPENAI_TIMEOUT_MILLISECONDS = 5_000;
@@ -45,9 +44,9 @@ const send = (
   appendBotMessage: ChatHookReturnType["appendBotMessage"],
   appendUserMessage: ChatHookReturnType["appendUserMessage"],
   audioReceivedCallback: ChatProps["audioReceivedCallback"],
-  isStreamingMessage: boolean
+  isLoadingMessage: boolean
 ) => {
-  if (isStreamingMessage) {
+  if (isLoadingMessage) {
     return;
   }
 
@@ -72,34 +71,21 @@ const send = (
     const messagesToSendToBackend = allMessages.slice(-2);
 
     // Sends a POST request to the backend.
-    const botResponsePromise = sendMessages(
-      messagesToSendToBackend,
-      setChatState,
-      appendBotMessage
-    );
-
-    // After we get a text message from the backend, we generate an audio file for that message.
-    botResponsePromise.then((botResponse: string) => {
-      if (botResponse) {
-        fetchAudio(botResponse).then((audio: HTMLAudioElement | null) =>
-          audioReceivedCallback(audio)
-        );
-      }
-    });
+    sendMessages(messagesToSendToBackend, setChatState, appendBotMessage, audioReceivedCallback);
   }
 };
 
 const sendMessages = async (
   messagesToSendToBackend: ChatMessage[],
   setChatState: ChatHookReturnType["setChatState"],
-  appendBotMessage: ChatHookReturnType["appendBotMessage"]
-): Promise<string> => {
-  let message = "";
+  appendBotMessage: ChatHookReturnType["appendBotMessage"],
+  audioReceivedCallback: ChatProps["audioReceivedCallback"]
+) => {
   let errorMessage = "";
 
   setChatState((currentState) => ({
     ...currentState,
-    isStreamingMessage: true,
+    isLoadingMessage: true,
   }));
 
   try {
@@ -122,46 +108,33 @@ const sendMessages = async (
       signal: controller.signal,
     });
 
+    // We have a response! Maybe it's an error, but not worries. We'll handle it below.
+    clearTimeout(timeoutId);
+
     if (!response.ok) {
       const result = await response.json();
       throw new Error(result.error);
     }
 
-    // This data is a ReadableStream
-    const data = response.body;
-    if (!data) {
-      return "";
-    }
+    const jsonResponse = await response.json();
 
-    const reader = data.getReader();
-    const decoder = new TextDecoder();
-    let done = false;
+    // Response has 2 parts: text and audio.
+    // 1. Here, we append the text to the chat's scroll view.
+    appendBotMessage({ content: jsonResponse.text, role: "assistant" });
 
-    while (!done) {
-      const { value, done: doneReading } = await reader.read();
-      done = doneReading;
-      const chunkValue = decoder.decode(value);
-      message += chunkValue;
-
-      appendBotMessage({ content: message, role: "assistant" }, !done);
-    }
-
-    clearTimeout(timeoutId);
+    // 2. And here, we play the audio.
+    const audioContent = jsonResponse.audio;
+    const audio = new Audio(`data:audio/mpeg;base64,${audioContent}`);
+    audioReceivedCallback(audio);
   } catch (error) {
     errorMessage = error.message || "Error: something went wrong.";
-
-    if (error.name === "AbortError") {
-      errorMessage = "One of your requests timed out :( please try again.";
-    }
   }
 
   setChatState((currentState) => ({
     ...currentState,
     errorMessage,
-    isStreamingMessage: false,
+    isLoadingMessage: false,
   }));
-
-  return message;
 };
 
 // This component takes care of showing the messages in the chat's scroll view.
@@ -207,7 +180,7 @@ export const Chat = ({ audioReceivedCallback, ...stackProps }: ChatProps) => {
   } = useChat();
   const media = useMedia();
 
-  const { isStreamingMessage } = chatState;
+  const { isLoadingMessage } = chatState;
 
   // Constant numbers:
   const regularMessagesBoxHeight = 300;
@@ -250,8 +223,8 @@ export const Chat = ({ audioReceivedCallback, ...stackProps }: ChatProps) => {
           ref={textAreaRef}
           h={textAreaHeight}
           // w={width - buttonSize - buttonMarginLeft}
-          placeholder={chatState.isStreamingMessage ? "Loading message..." : "Type message here"}
-          disabled={chatState.isStreamingMessage}
+          placeholder={chatState.isLoadingMessage ? "Loading message..." : "Type message here"}
+          disabled={chatState.isLoadingMessage}
           returnKeyType="send"
           multiline
           blurOnSubmit={false}
@@ -265,7 +238,7 @@ export const Chat = ({ audioReceivedCallback, ...stackProps }: ChatProps) => {
                 appendBotMessage,
                 appendUserMessage,
                 audioReceivedCallback,
-                isStreamingMessage
+                isLoadingMessage
               );
             }
           }}
@@ -277,14 +250,14 @@ export const Chat = ({ audioReceivedCallback, ...stackProps }: ChatProps) => {
               appendBotMessage,
               appendUserMessage,
               audioReceivedCallback,
-              isStreamingMessage
+              isLoadingMessage
             )
           }
           maxLength={MAX_CHARS}
           onChangeText={(text: string) => setChatState({ ...chatState, charCount: text.length })}
         />
 
-        {isStreamingMessage ? (
+        {isLoadingMessage ? (
           <Spinner
             height={buttonSize}
             width={buttonSize}
@@ -309,7 +282,7 @@ export const Chat = ({ audioReceivedCallback, ...stackProps }: ChatProps) => {
                 appendBotMessage,
                 appendUserMessage,
                 audioReceivedCallback,
-                isStreamingMessage
+                isLoadingMessage
               )
             }
           />

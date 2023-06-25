@@ -43,7 +43,7 @@ export const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({
         backgroundColor="white"
       >
         <Text mr={12} textAlign="center" lineHeight={lineHeight}>
-          This website uses the the OpenAI API. They collect data. Be sure to read and accept the{" "}
+          This website uses the OpenAI API. They collect data. Be sure to read and accept the{" "}
           <Anchor onPress={onAnchorPress} lineHeight={lineHeight} color="#007bff" cursor="pointer">
             data processing policy.
           </Anchor>
