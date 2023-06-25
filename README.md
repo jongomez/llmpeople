@@ -1,6 +1,6 @@
 This is a monorepo for the [gpthangout project.](https://www.gpthangout.com/)
 
-It was built with the [next+expo+solito starter template - check out their README.](https://github.com/tamagui/tamagui/tree/master/starters/next-expo-solito)
+It was built with the [next+expo+solito starter template.](https://github.com/tamagui/tamagui/tree/master/starters/next-expo-solito)
 
 # HOW TO SET UP
 
@@ -36,7 +36,13 @@ e.g. go into the apps/next folder, and run:
 
 npx jest lib/babylonjs/\_\_tests\_\_/utils.test.ts --watch
 
-# OTHER
+# Model
+
+The model used in this project is a [VRoid model.](https://vroid.com/en/studio)
+
+For more info on how I set up the model and anims, [check out the following babylonJS forum thread.](https://forum.babylonjs.com/t/chatgpt-3d-talking-models/39801)
+
+# Other
 
 Reduce png image quality and size:
 
