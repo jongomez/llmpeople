@@ -46,9 +46,9 @@ const createAxesViewerAndAxesCamera = (scene: Scene): AxesViewerAndAxesCamera =>
 export const createCamera = (scene: Scene): ArcRotateCamera => {
   const camera = new ArcRotateCamera(
     "MainCamera",
-    -Math.PI / 2,
+    Math.PI / 2,
     Math.PI / 2.5,
-    2.5,
+    3,
     v3(0, 0.7, 0),
     scene
   );

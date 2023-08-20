@@ -83,15 +83,9 @@ export const initBabylon = (
   var scene = createScene(engine, canvas);
 
   // First time loading this character. Create a new Humanoid instance.
-  humanoidRef.current = new Humanoid(
-    "MyMesh",
-    "Model3_11.babylon",
-    scene,
-    "idle3_hand_hips",
-    () => {
-      // console.log("After import callback called!");
-    }
-  );
+  humanoidRef.current = new Humanoid("MyMesh", "Model3_11.babylon", scene, "idle1", () => {
+    // console.log("After import callback called!");
+  });
 
   engine.runRenderLoop(function () {
     // NOTE: The following executeWhenReady makes sure we only show stuff when everything is:

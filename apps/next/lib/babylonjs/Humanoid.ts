@@ -11,80 +11,17 @@ import {
   Skeleton,
   Vector3,
 } from "babylonjs";
-import { random, sample } from "lodash";
-import myModel from "../models/Model3_11.json";
+import { random } from "lodash";
+import myModel from "../models/Model0_1.json";
 import { playMorphTargetAnim } from "./utils";
 
 type MyMesh = AbstractMesh | Mesh;
 
-type Anims =
-  | "idle1"
-  | "idle2"
-  | "idle3_hand_hips"
-  | "talking1"
-  | "talking2_head_shake"
-  | "talking3";
+type Anims = "idle1";
 export class Humanoid {
   name: string = "";
   skeleton: Skeleton | null = null;
-  morphTargetNames: string[] = [
-    "Face.M_F00_000_00_Fcl_ALL_Neutral",
-    "Face.M_F00_000_00_Fcl_ALL_Angry",
-    "Face.M_F00_000_00_Fcl_ALL_Fun",
-    "Face.M_F00_000_00_Fcl_ALL_Joy",
-    "Face.M_F00_000_00_Fcl_ALL_Sorrow",
-    "Face.M_F00_000_00_Fcl_ALL_Surprised",
-    "Face.M_F00_000_00_Fcl_BRW_Angry",
-    "Face.M_F00_000_00_Fcl_BRW_Fun",
-    "Face.M_F00_000_00_Fcl_BRW_Joy",
-    "Face.M_F00_000_00_Fcl_BRW_Sorrow",
-    "Face.M_F00_000_00_Fcl_BRW_Surprised",
-    "Face.M_F00_000_00_Fcl_EYE_Natural",
-    "Face.M_F00_000_00_Fcl_EYE_Angry",
-    "Face.M_F00_000_00_Fcl_EYE_Close",
-    "Face.M_F00_000_00_Fcl_EYE_Close_R",
-    "Face.M_F00_000_00_Fcl_EYE_Close_L",
-    "Face.M_F00_000_00_Fcl_Eye_Fun",
-    "Face.M_F00_000_00_Fcl_EYE_Joy",
-    "Face.M_F00_000_00_Fcl_EYE_Joy_R",
-    "Face.M_F00_000_00_Fcl_EYE_Joy_L",
-    "Face.M_F00_000_00_Fcl_EYE_Sorrow",
-    "Face.M_F00_000_00_Fcl_EYE_Surprised",
-    "Face.M_F00_000_00_Fcl_EYE_Spread",
-    "Face.M_F00_000_00_Fcl_EYE_Iris_Hide",
-    "Face.M_F00_000_00_Fcl_EYE_Highlight_Hide",
-    "Face.M_F00_000_00_Fcl_EYE_Extra",
-    "Face.M_F00_000_00_Fcl_MTH_Up",
-    "Face.M_F00_000_00_Fcl_MTH_Down",
-    "Face.M_F00_000_00_Fcl_MTH_Angry",
-    "Face.M_F00_000_00_Fcl_MTH_Neutral",
-    "Face.M_F00_000_00_Fcl_MTH_Fun",
-    "Face.M_F00_000_00_Fcl_MTH_Joy",
-    "Face.M_F00_000_00_Fcl_MTH_Sorrow",
-    "Face.M_F00_000_00_Fcl_MTH_Surprised",
-    "Face.M_F00_000_00_Fcl_MTH_SkinFung",
-    "Face.M_F00_000_00_Fcl_MTH_SkinFung_R",
-    "Face.M_F00_000_00_Fcl_MTH_SkinFung_L",
-    "Face.M_F00_000_00_Fcl_MTH_A",
-    "Face.M_F00_000_00_Fcl_MTH_I",
-    "Face.M_F00_000_00_Fcl_MTH_U",
-    "Face.M_F00_000_00_Fcl_MTH_E",
-    "Face.M_F00_000_00_Fcl_MTH_O",
-    "Face.M_F00_000_00_Fcl_HA_Hide",
-    "Face.M_F00_000_00_Fcl_HA_Fung1",
-    "Face.M_F00_000_00_Fcl_HA_Fung1_Low",
-    "Face.M_F00_000_00_Fcl_HA_Fung1_Up",
-    "Face.M_F00_000_00_Fcl_HA_Fung2",
-    "Face.M_F00_000_00_Fcl_HA_Fung2_Low",
-    "Face.M_F00_000_00_Fcl_HA_Fung2_Up",
-    "Face.M_F00_000_00_Fcl_HA_Fung3",
-    "Face.M_F00_000_00_Fcl_HA_Fung3_Up",
-    "Face.M_F00_000_00_Fcl_HA_Fung3_Low",
-    "Face.M_F00_000_00_Fcl_HA_Short",
-    "Face.M_F00_000_00_Fcl_HA_Short_Up",
-    "Face.M_F00_000_00_Fcl_HA_Short_Low",
-    "EyeExtra_01.M_F00_000_00_EyeExtra_On",
-  ];
+  morphTargetNames: string[] = ["OpenMouth"];
   intervalId: number = 0;
   mainMesh: AbstractMesh | Mesh | null = null;
   meshes: MyMesh[] = [];
@@ -93,7 +30,6 @@ export class Humanoid {
   loaded = false;
   currentAnimationName: string = "";
   skeletonViewer: any = {};
-  faceMesh: Mesh | null = null;
   blinkingInfluence: number = 0;
   isBlinkingLeftEye = false;
   isBlinkingRightEye = false;
@@ -122,7 +58,6 @@ export class Humanoid {
       this.skeleton = res.skeletons[0];
       this.meshes = res.meshes;
       this.mainMesh = res.meshes[0];
-      this.setFaceMesh();
 
       for (const mesh of res.meshes) {
         mesh.position.y += this.yOffset;
@@ -207,7 +142,7 @@ export class Humanoid {
 
       this.callback();
 
-      window.setTimeout(() => this.blink(), 2000);
+      // window.setTimeout(() => this.blink(), 2000);
 
       // Debug the talking animations.
       // this.talkAnimationStart();
@@ -300,8 +235,8 @@ export class Humanoid {
   }
 
   getMorphTargetByName(morphTargetName: string): MorphTarget | null {
-    if (!this.faceMesh?.morphTargetManager) {
-      console.error("faceMesh is null or does not have a morphTargetManager :(");
+    if (!this.mainMesh?.morphTargetManager) {
+      console.error("mainMesh is null or does not have a morphTargetManager :(");
       return null;
     }
 
@@ -312,21 +247,7 @@ export class Humanoid {
       return null;
     }
 
-    return this.faceMesh.morphTargetManager.getTarget(morphTargetIndex);
-  }
-
-  setFaceMesh() {
-    const faceMeshArray = this.meshes.filter((mesh) => {
-      return mesh.name === "Face";
-    });
-    const faceMesh = faceMeshArray[0] as Mesh;
-
-    if (!faceMesh) {
-      console.error("Error - couldn't find face mesh :(");
-      return;
-    }
-
-    this.faceMesh = faceMesh;
+    return this.mainMesh.morphTargetManager.getTarget(morphTargetIndex);
   }
 
   blink() {
@@ -380,19 +301,11 @@ export class Humanoid {
   }
 
   getRandomIdleAnim(): Anims {
-    // NOTE: idle1 also exists, but it's not very good.
-    const idleAnims: Anims[] = ["idle3_hand_hips", "idle2"];
-
-    // NOTE: The | "idle3_hand_hips" is there only to make TypeScript happy.
-    return sample(idleAnims) || "idle3_hand_hips";
+    return "idle1";
   }
 
   getRandomTalkingAnim(): Anims {
-    //const talkingAnims: Anims[] = ["talking1", "talking3"];
-    const talkingAnims: Anims[] = ["talking1", "talking2_head_shake", "talking3"];
-
-    // NOTE: The | "talking3" is there only to make TypeScript happy.
-    return sample(talkingAnims) || "talking3";
+    return "idle1";
   }
 
   talkAnimationEnd(info: string, playRandomIdleAnim = true) {
@@ -423,11 +336,7 @@ export class Humanoid {
     const maxTime = 0.5;
     const minTime = 0.2;
 
-    const aTarget = this.getMorphTargetByName("Face.M_F00_000_00_Fcl_MTH_A");
-    // const eTarget = this.getMorphTargetByName("Face.M_F00_000_00_Fcl_MTH_E");
-    // const iTarget = this.getMorphTargetByName("Face.M_F00_000_00_Fcl_MTH_I");
-    // const oTarget = this.getMorphTargetByName("Face.M_F00_000_00_Fcl_MTH_O");
-    // const uTarget = this.getMorphTargetByName("Face.M_F00_000_00_Fcl_MTH_U");
+    const aTarget = this.getMorphTargetByName("OpenMouth");
 
     if (!aTarget) {
       return;
@@ -482,7 +391,7 @@ export class Humanoid {
       });
     };
 
-    alternateBetweenAnims(this.getRandomTalkingAnim(), this.currentAnimName || "idle3_hand_hips");
+    // alternateBetweenAnims(this.getRandomTalkingAnim(), this.currentAnimName || "idle3_hand_hips");
   }
 
   DEBUGSTUFF() {
