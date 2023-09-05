@@ -12,8 +12,10 @@ import {
   Vector3,
 } from "babylonjs";
 import { random, sample } from "lodash";
-import myModel from "../models/Model3_11.json";
 import { playMorphTargetAnim } from "./utils";
+// Enable GLTF/GLB loader (side-effects)
+import "@babylonjs/loaders/glTF";
+import "babylonjs-loaders";
 
 type MyMesh = AbstractMesh | Mesh;
 
@@ -114,52 +116,61 @@ export class Humanoid {
     this.name = this.meshFileName.split(".")[0];
     this.intervalId = window.setInterval(this.afterImport.bind(this), 300);
 
-    const modelDataString = JSON.stringify(myModel);
-    const modelDataBase64 = btoa(modelDataString);
-    const modelDataURL = `data:application/json;base64,${modelDataBase64}`;
+    // SceneLoader.ImportMeshAsync("", "/", modelDataURL, this.scene, null).then((res) => {
 
-    SceneLoader.ImportMeshAsync("", "/", modelDataURL, this.scene, null).then((res) => {
-      this.skeleton = res.skeletons[0];
-      this.meshes = res.meshes;
-      this.mainMesh = res.meshes[0];
-      this.setFaceMesh();
+    SceneLoader.ImportMesh(
+      "",
+      "/",
+      "ModelWithAnimation.glb",
+      scene,
+      (meshes, particleSystems, skeletons, animationGroups) => {
+        this.skeleton = skeletons[0];
+        this.meshes = meshes;
+        this.mainMesh = meshes[0];
+        this.setFaceMesh();
 
-      for (const mesh of res.meshes) {
-        mesh.position.y += this.yOffset;
-        mesh.alwaysSelectAsActiveMesh = true;
+        for (const mesh of meshes) {
+          mesh.position.y += this.yOffset;
+          mesh.alwaysSelectAsActiveMesh = true;
 
-        // Only show when all meshes are rendered. This is an alternative to scene.executeWhenReady
-        // HACK! Way of hiding the mesh that actually renders the mesh (doing .isVisible = false will not render the mesh)
-        // mesh.position.z = 1000;
-        // (mesh as Mesh).onAfterRenderObservable.addOnce((renderedMesh) => {
-        //   this.renderedMeshes.add(renderedMesh.name);
-        // });
-      }
+          // Only show when all meshes are rendered. This is an alternative to scene.executeWhenReady
+          // HACK! Way of hiding the mesh that actually renders the mesh (doing .isVisible = false will not render the mesh)
+          // mesh.position.z = 1000;
+          // (mesh as Mesh).onAfterRenderObservable.addOnce((renderedMesh) => {
+          //   this.renderedMeshes.add(renderedMesh.name);
+          // });
+        }
 
-      this.mainMesh.skeleton = this.skeleton;
+        this.mainMesh.skeleton = this.skeleton;
 
-      // Improves performance when we're picking stuff with rays. Also, this doesn't work (meshes deformed with rigs are on GPU, picking is done with CPU).
-      // In order to pick the mesh, we'll use the this.colliders boxes.
-      this.mainMesh.isPickable = false;
-      // XXX: If this is false, how come cc collides the mesh with the ground??? BECAUSE it sets an ellipsoid, and calls moveWithCollision().
-      // ... so no need for checkCollisions to be true.
-      this.mainMesh.checkCollisions = false;
+        // Improves performance when we're picking stuff with rays. Also, this doesn't work (meshes deformed with rigs are on GPU, picking is done with CPU).
+        // In order to pick the mesh, we'll use the this.colliders boxes.
+        this.mainMesh.isPickable = false;
+        // XXX: If this is false, how come cc collides the mesh with the ground??? BECAUSE it sets an ellipsoid, and calls moveWithCollision().
+        // ... so no need for checkCollisions to be true.
+        this.mainMesh.checkCollisions = false;
 
-      this.mainMesh.receiveShadows = false;
+        this.mainMesh.receiveShadows = false;
 
-      this.setAnim(this.startAnim);
+        this.setAnim(this.startAnim);
 
-      // Rotate the character, so the z axis is pointing forward.
-      this.mainMesh.rotation.y = Math.PI;
+        // Rotate the character, so the z axis is pointing forward.
+        this.mainMesh.rotation.y = Math.PI;
 
-      if (!this.activate) this.mainMesh.setEnabled(false);
+        if (!this.activate) this.mainMesh.setEnabled(false);
 
-      // Handle mesh shadows, backface culling, etc.
-      // this.childMeshes = childMeshes
-      // this.processChildMeshes()
+        // Handle mesh shadows, backface culling, etc.
+        // this.childMeshes = childMeshes
+        // this.processChildMeshes()
 
-      if (this.DEBUG) this.DEBUGSTUFF();
-    });
+        if (this.DEBUG) this.DEBUGSTUFF();
+      },
+      undefined,
+      (scene, errorMessage, errorObj) => {
+        console.error("Error loading mesh:", errorMessage, "\nerrorObj:", errorObj);
+      },
+      ".glb"
+    );
   }
 
   hide() {

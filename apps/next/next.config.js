@@ -88,6 +88,28 @@ module.exports = function () {
     },
   };
 
+  const existingWebpackConfig = config.webpack || ((x) => x);
+
+  config.webpack = (c, options) => {
+    // Apply the existing webpack config if it exists
+    c = existingWebpackConfig(c, options);
+
+    // Load source maps in dev mode
+    if (c.mode === "development") {
+      c.module.rules.push({
+        test: /\.js$/,
+        use: ["source-map-loader"],
+        enforce: "pre",
+      });
+    }
+
+    // Fix for IgnorePlugin
+    c.plugins.push(new options.webpack.IgnorePlugin({ resourceRegExp: /\/__tests__\// }));
+
+    // Important: return the modified config
+    return c;
+  };
+
   for (const plugin of plugins) {
     config = {
       ...config,

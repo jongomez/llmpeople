@@ -1667,6 +1667,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babylonjs/core@npm:^6.19.1":
+  version: 6.19.1
+  resolution: "@babylonjs/core@npm:6.19.1"
+  checksum: 6e75d672d675321bb1330b549a7275c65a6af2467c131997debf41af642ebf347e30ed22c6bbd13cc53a52d71cf923779e31230c8b6993c4fbb15df2bb1183fb
+  languageName: node
+  linkType: hard
+
+"@babylonjs/loaders@npm:^6.19.1":
+  version: 6.19.1
+  resolution: "@babylonjs/loaders@npm:6.19.1"
+  peerDependencies:
+    "@babylonjs/core": ^6.0.0
+    babylonjs-gltf2interface: ^6.0.0
+  checksum: d7e4f9a417667b917fed664ac707514327e39359577de6a1536f496ca1be88e89105ee335927c30703c95d42ce4b96f3dc18635bc5ee0362d5ab464efff4e075
+  languageName: node
+  linkType: hard
+
 "@bcoe/v8-coverage@npm:^0.2.3":
   version: 0.2.3
   resolution: "@bcoe/v8-coverage@npm:0.2.3"
@@ -5602,6 +5619,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"abab@npm:^2.0.6":
+  version: 2.0.6
+  resolution: "abab@npm:2.0.6"
+  checksum: 6ffc1af4ff315066c62600123990d87551ceb0aafa01e6539da77b0f5987ac7019466780bf480f1787576d4385e3690c81ccc37cfda12819bf510b8ab47e5a3e
+  languageName: node
+  linkType: hard
+
 "abbrev@npm:1, abbrev@npm:^1.0.0":
   version: 1.1.1
   resolution: "abbrev@npm:1.1.1"
@@ -6374,6 +6398,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"babylonjs-gltf2interface@npm:^6.19.1":
+  version: 6.19.1
+  resolution: "babylonjs-gltf2interface@npm:6.19.1"
+  checksum: 5feeb52ef893ef6b567dc6aca6e9e4b50e11b302836a402bdced1f4beea196464e9bc21f02a1ed52a6e519327a57af80bb2bf0aafe69adb45e391c9c08a67da8
+  languageName: node
+  linkType: hard
+
 "babylonjs-gui-editor@npm:^5.51.0":
   version: 5.51.0
   resolution: "babylonjs-gui-editor@npm:5.51.0"
@@ -6417,6 +6448,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"babylonjs-loaders@npm:^6.19.1":
+  version: 6.19.1
+  resolution: "babylonjs-loaders@npm:6.19.1"
+  dependencies:
+    babylonjs: ^6.19.1
+    babylonjs-gltf2interface: ^6.19.1
+  checksum: 4914f3b3096a3dbf36b171e7422f18a08ae9d95e1fb1bf770f5b1c0d1fcd453ddacd509672cc2fa784413bd84afceba500d603322682da0747926da29fd34920
+  languageName: node
+  linkType: hard
+
 "babylonjs-materials@npm:^5.51.0":
   version: 5.51.0
   resolution: "babylonjs-materials@npm:5.51.0"
@@ -6436,10 +6477,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"babylonjs@npm:^5.46.0, babylonjs@npm:^5.51.0":
+"babylonjs@npm:^5.51.0":
   version: 5.51.0
   resolution: "babylonjs@npm:5.51.0"
   checksum: 15a852419de99fb65916af0f02b6a6e27bbadbd4b40f079608df77c682925c775ce46137b0abd2afd1faabd2beec8f3f41789ffe363bff182f082da0f15f5daa
+  languageName: node
+  linkType: hard
+
+"babylonjs@npm:^6.19.1":
+  version: 6.19.1
+  resolution: "babylonjs@npm:6.19.1"
+  checksum: af1544c4c6b1d241c0f8eadb5feb0edefe0261823d5c5988002a3c91ebf086f1a8799a2c4cd0f674b27beabf52ebda7f4654a5556a1fb6f3d513b904f6b50dad
   languageName: node
   linkType: hard
 
@@ -10773,7 +10821,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"iconv-lite@npm:^0.6.2":
+"iconv-lite@npm:^0.6.2, iconv-lite@npm:^0.6.3":
   version: 0.6.3
   resolution: "iconv-lite@npm:0.6.3"
   dependencies:
@@ -13585,6 +13633,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "next-app@workspace:apps/next"
   dependencies:
+    "@babylonjs/core": ^6.19.1
+    "@babylonjs/loaders": ^6.19.1
     "@google-cloud/text-to-speech": ^4.2.1
     "@microsoft/fetch-event-source": ^2.0.1
     "@tamagui/next-plugin": 1.7.8
@@ -13594,8 +13644,9 @@ __metadata:
     "@types/lodash": ^4.14.192
     "@types/node": ^18.6.4
     app: "*"
-    babylonjs: ^5.46.0
+    babylonjs: ^6.19.1
     babylonjs-inspector: ^5.49.0
+    babylonjs-loaders: ^6.19.1
     critters: ^0.0.16
     eslint-config-next: ^13.0.4
     eventsource-parser: ^0.0.5
@@ -13610,6 +13661,7 @@ __metadata:
     react-native: 0.70.5
     react-native-web: ~0.18.7
     react-native-web-lite: ^1.7.8
+    source-map-loader: ^4.0.1
     ts-jest: ^29.0.5
     ts-node: ^10.9.1
     vercel: latest
@@ -16290,6 +16342,19 @@ __metadata:
   version: 1.0.2
   resolution: "source-map-js@npm:1.0.2"
   checksum: c049a7fc4deb9a7e9b481ae3d424cc793cb4845daa690bc5a05d428bf41bf231ced49b4cf0c9e77f9d42fdb3d20d6187619fc586605f5eabe995a316da8d377c
+  languageName: node
+  linkType: hard
+
+"source-map-loader@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "source-map-loader@npm:4.0.1"
+  dependencies:
+    abab: ^2.0.6
+    iconv-lite: ^0.6.3
+    source-map-js: ^1.0.2
+  peerDependencies:
+    webpack: ^5.72.1
+  checksum: 4ddca8b03dc61f406effd4bffe70de4b87fef48bae6f737017b2dabcbc7d609133325be1e73838e9265331de28039111d729fcbb8bce88a6018a816bef510eb1
   languageName: node
   linkType: hard
 
