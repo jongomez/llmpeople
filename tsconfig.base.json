@@ -26,7 +26,7 @@
     "sourceMap": false,
     "strictNullChecks": true,
     "target": "es2019",
-    "types": ["node"],
+    "types": ["node", "babylonjs-loaders", "babylonjs"],
     "lib": ["es2021", "dom", "esnext"]
   },
   "exclude": ["_"],
