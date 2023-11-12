@@ -1,10 +1,10 @@
 This is a monorepo for the [llmpeople project - chat with a 3D model powered by ChatGPT.](https://www.llmpeople.com/)
 
-It uses BabylonJS, NextJS, TypeScript, the OpenAI API.
+It uses BabylonJS, NextJS, TypeScript, and the OpenAI API.
 
 # HOW TO SET UP
 
-An OpenAI API key is required. Check out the OPENAI_API_KEY env var in the .env file. If instead of OpenAI's voices you wish to use Google Cloud's voices, you'll need a Google Cloud API key. Check out the GOOGLE_CLOUD_API_KEY env var in the .env file.
+An OpenAI API key is required. Check out the OPENAI_API_KEY env var in the .env file. If instead of OpenAI's voices you wish to use Google Cloud's voices, you'll need a Google Cloud API key - and use the GOOGLE_CLOUD_API_KEY env var instead.
 
 1. **Install npm** - [nvm](https://github.com/nvm-sh/nvm#installing-and-updating) and node version 18.14.2 are recommended (this is the LTS version as of June 25 2023)
 
@@ -32,7 +32,7 @@ You can share your model and settings by copying the URL in the settings modal. 
 
 [https://www.llmpeople.com/?model=vest_dude&voice=fable&prompt=Prompt+-+respond+as+spongebob](https://www.llmpeople.com/?model=vest_dude&voice=fable&prompt=Prompt+-+respond+as+spongebob)
 
-Will load the `vest_dude` model, the `fable` voice, and the prompt `Prompt - respond as spongebob`.
+Will load the `vest_dude` model, the `fable` voice, and the prompt `Prompt - respond as spongebob`
 
 # Use a custom model
 
@@ -55,7 +55,9 @@ export const models = {
 
 ```
 
-The model's filename should match the key in the `models` object - in this case, the key is `my_new_model` and the filename is `my_new_model.glb`. To simplify the configuration step, we can start with the defaultConfig: `my_new_model: defaultConfig`, and then adjust it as necessary. For example, let's image that our custom model only has 1 idle animation: `custom_idle_animation` - we could update the `models` object as follows:
+The model's filename should match the key in the `models` object. In this example, the key is `my_new_model` and the filename is `my_new_model.glb`.
+
+To simplify the configuration step, we can start with the defaultConfig: `my_new_model: defaultConfig`, and then adjust it as necessary. For example, let's image that our custom model only has 1 idle animation: `custom_idle_animation` - we would need to update the `models` object as follows:
 
 ```javascript
 export const models = {
@@ -65,7 +67,7 @@ export const models = {
   },
   my_new_model: {
     ...defaultConfig,
-    idleAnimations: ['custom_idle_animation']
+    idleAnimations: ['custom_idle_animation'] // add custom idle animation here.
   },
 } as const;
 
