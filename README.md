@@ -1,12 +1,10 @@
-This is a monorepo for the [gpthangout project.](https://www.gpthangout.com/)
+This is a monorepo for the [llmpeople project - chat with a 3D model powered by ChatGPT.](https://www.llmpeople.com/)
 
-It was built with the [next+expo+solito starter template.](https://github.com/tamagui/tamagui/tree/master/starters/next-expo-solito)
+It uses BabylonJS, NextJS, TypeScript, the OpenAI API.
 
 # HOW TO SET UP
 
-An OpenAI API key is required. Check out the OPENAI_API_KEY env var in the .env file.
-
-A Google Cloud API key is required. Check out the GOOGLE_API_KEY env var in the .env file.
+An OpenAI API key is required. Check out the OPENAI_API_KEY env var in the .env file. If instead of OpenAI's voices you wish to use Google Cloud's voices, you'll need a Google Cloud API key. Check out the GOOGLE_CLOUD_API_KEY env var in the .env file.
 
 1. **Install npm** - [nvm](https://github.com/nvm-sh/nvm#installing-and-updating) and node version 18.14.2 are recommended (this is the LTS version as of June 25 2023)
 
@@ -16,34 +14,59 @@ A Google Cloud API key is required. Check out the GOOGLE_API_KEY env var in the 
 
 4. **Install the dependencies** - Simply run `yarn` in the root folder of this project.
 
-5. **Run the project** - Run `yarn web` in the root folder of this project.
+5. **Run the project** - Run `yarn dev` in the root folder of this project.
 
-# Android & iOS
+# Models
 
-In the apps/expo directory there's code to run this project on Android and iOS. It's currently not working, and I have no plans to fix it atm.
+There are 2 models available:
 
-# Native & web env vars
+1. [A VRoid model](https://vroid.com/en/studio)
 
-- Setting up env vars for both native and web is a little different than usual. See TAMAGUI_TARGET for an example.
+2. [A free renderpeople model](https://renderpeople.com/free-3d-people/)
 
-# Jest
+You can switch between these models in the settings modal.
 
-Run individual test files with:
+# Share your model and settings
 
-npx jest path/to/testFile.test.ts --watch
+You can share your model and settings by copying the URL in the settings modal. This URL contains the model and settings you are currently using. When someone visits this URL, they will see the same model and settings you are currently using. For example, the following URL:
 
-e.g. go into the apps/next folder, and run:
+[https://www.llmpeople.com/?model=vest_dude&voice=fable&prompt=Prompt+-+respond+as+spongebob](https://www.llmpeople.com/?model=vest_dude&voice=fable&prompt=Prompt+-+respond+as+spongebob)
 
-npx jest lib/babylonjs/\_\_tests\_\_/utils.test.ts --watch
+Will load the `vest_dude` model, the `fable` voice, and the prompt `Prompt - respond as spongebob`.
 
-# Model
+# Use a custom model
 
-The model used in this project is a [VRoid model.](https://vroid.com/en/studio)
+If you wish to use a custom model, the recommended way is to use [Blender](https://www.blender.org/) and follow the steps below:
 
-For more info on how I set up the model and anims, [check out the following babylonJS forum thread.](https://forum.babylonjs.com/t/chatgpt-3d-talking-models/39801)
+1. Export the model as .glb
+2. Save the .glb file in the public folder of this project
+3. Create a new config for the model in the constants.ts file. If the model filename is `my_new_model.glb`, we will need to update the `models` object with the following:
 
-# Other
+```javascript
+export const models = {
+  vroid_girl1: defaultConfig,
+  vest_dude: {
+    // (vest_dude's model config)
+  },
+  my_new_model: {
+    // (my_new_model's model config - add your config here)
+  },
+} as const;
 
-Reduce png image quality and size:
+```
 
-pngquant --quality 10-80 --speed 1 --output output_reduced0.png --force Image_0.png
+The model's filename should match the key in the `models` object - in this case, the key is `my_new_model` and the filename is `my_new_model.glb`. To simplify the configuration step, we can start with the defaultConfig: `my_new_model: defaultConfig`, and then adjust it as necessary. For example, let's image that our custom model only has 1 idle animation: `custom_idle_animation` - we could update the `models` object as follows:
+
+```javascript
+export const models = {
+  vroid_girl1: defaultConfig,
+  vest_dude: {
+    // (vest_dude's model config)
+  },
+  my_new_model: {
+    ...defaultConfig,
+    idleAnimations: ['custom_idle_animation']
+  },
+} as const;
+
+```

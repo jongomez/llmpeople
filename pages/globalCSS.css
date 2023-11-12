@@ -1,0 +1,14 @@
+:root {
+  --main-text-colors: #333; /* Dark text color */
+  --tertiary-colors: #f4f4f4; /* Light gray color */
+  --inactive-colors: #ccc; /* Inactive gray color */
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

@@ -1,38 +1,52 @@
 {
-  "name": "myapp-monorepo",
+  "name": "llmpeople",
+  "version": "0.1.0",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
   "scripts": {
-    "native": "cd apps/expo && yarn start",
-    "watch": "yarn workspaces foreach -pi run watch",
-    "vercel:install": "yarn set version stable && yarn install",
-    "web": "yarn build && cd apps/next && yarn next",
-    "web:extract": "DISABLE_EXTRACTION=false yarn workspace next-app dev",
-    "web:prod": "yarn workspace next-app build",
-    "web:prod:serve": "yarn workspace next-app serve",
-    "fix": "manypkg fix",
-    "postinstall": "yarn build",
-    "build": "yarn workspaces foreach --exclude next-app -pi run build",
-    "upgrade:tamagui": "manypkg upgrade tamagui && manypkg upgrade @tamagui && manypkg upgrade tamagui-loader && manypkg upgrade react-native-web-lite"
-  },
-  "resolutions": {
-    "@types/react-native": "0.70.8",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "react-refresh": "^0.14.0",
-    "react-native-svg": "13.4.0",
-    "react-native-web": "0.18.9"
+    "dev": "next dev",
+    "build": "cd ../.. && yarn build && cd apps/next && next build",
+    "start": "next start",
+    "serve": "NODE_ENV=production next start --port 8151",
+    "lint": "next lint"
   },
   "dependencies": {
-    "@babel/runtime": "^7.18.9",
-    "@manypkg/cli": "^0.19.1",
-    "eslint": "^8.21.0",
-    "prettier": "^2.7.1",
-    "turbo": "^1.4.2",
-    "typescript": "^4.7.4"
+    "@babylonjs/core": "^6.19.1",
+    "@babylonjs/loaders": "^6.19.1",
+    "@google-cloud/text-to-speech": "^4.2.1",
+    "@microsoft/fetch-event-source": "^2.0.1",
+    "@tanstack/react-query": "^4.28.0",
+    "app": "*",
+    "babylonjs": "^6.19.1",
+    "babylonjs-loaders": "^6.19.1",
+    "eventsource-parser": "^0.0.5",
+    "immer": "^10.0.3",
+    "lodash": "^4.17.21",
+    "lucide-react": "^0.289.0",
+    "next": "^13.0.6",
+    "openai": "^3.2.1",
+    "raf": "^3.4.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "styled-components": "^6.1.0",
+    "use-immer": "^0.9.0",
+    "vercel": "latest"
   },
-  "packageManager": "yarn@3.6.0"
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@types/lodash": "^4.14.192",
+    "@types/node": "^18.6.4",
+    "@types/react": "^18.2.6",
+    "@types/react-dom": "^18.2.4",
+    "babylonjs-inspector": "^5.49.0",
+    "critters": "^0.0.16",
+    "eslint": "^8.21.0",
+    "eslint-config-next": "^13.0.4",
+    "jest": "^29.5.0",
+    "next-images": "^1.8.4",
+    "prettier": "^2.7.1",
+    "source-map-loader": "^4.0.1",
+    "ts-jest": "^29.0.5",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.7.4"
+  }
 }
