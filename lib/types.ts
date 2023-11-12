@@ -1,7 +1,8 @@
 import { Vector3 } from "babylonjs";
 import { Dispatch } from "react";
 import { Humanoid } from "./babylonjs/Humanoid";
-import { models, voices } from "./constants";
+import { models } from "./constants";
+import { voices } from "./voices";
 
 type SoundController = {
   isVolumeOn: boolean;

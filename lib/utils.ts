@@ -1,5 +1,4 @@
-import { models, voices } from "./constants";
-import { Voice } from "./types";
+import { models } from "./constants";
 
 export function isWebview(): boolean {
   if (typeof window === undefined) {
@@ -35,27 +34,4 @@ export const isModelValid = (model: string | null): boolean => {
   }
 
   return true;
-};
-
-export const isVoiceValid = (voice: string | null): boolean => {
-  if (!voice) {
-    return false;
-  }
-
-  if (!Object.keys(voices).includes(voice)) {
-    return false;
-  }
-
-  return true;
-};
-
-export const isGoogleVoice = (voice: string): boolean => {
-  if (!Object.keys(voices).find((v) => v === voice)) {
-    const errorMessage = `Voice ${voice} not found in voices object.`;
-    throw new Error(errorMessage);
-  }
-
-  const voiceInfo = voices[voice as Voice];
-
-  return voiceInfo.provider === "Google Cloud";
 };

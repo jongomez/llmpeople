@@ -5,11 +5,9 @@ import {
   DEFAULT_PROMPT,
   DEFAULT_VOICE,
   models,
-  voiceNames,
-  voices,
 } from "@/lib/constants";
 import { MainStateDispatch, Model, SettingsType, Voice } from "@/lib/types";
-import { isGoogleVoice } from "@/lib/utils";
+import { isGoogleVoice, voiceNames, voices } from "@/lib/voices";
 import { Settings } from "lucide-react";
 import { FC } from "react";
 import styled from "styled-components";

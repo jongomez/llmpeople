@@ -1,6 +1,7 @@
 import { DEFAULT_INITIAL_MESSAGE, DEFAULT_MODEL } from "@/lib/constants";
 import { ChatMessage, MainStateDispatch, Model, SettingsType, Voice } from "@/lib/types";
-import { isModelValid, isVoiceValid } from "@/lib/utils";
+import { isModelValid } from "@/lib/utils";
+import { isVoiceValid } from "@/lib/voices";
 import { useEffect, useRef, useState } from "react";
 
 type MessagesContainerRef = HTMLElement & {

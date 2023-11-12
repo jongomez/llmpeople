@@ -5,10 +5,11 @@ import {
   synthesizeSpeechOpenAi,
   validateRequest,
 } from "@/lib/backendUtils";
-import { MAX_REQUEST_BODY_LENGTH } from "@/lib/constants";
 import { dummyBotAudio, dummyBotMessages } from "@/lib/dummyResponses";
 import { ChatMessage } from "@/lib/types";
-import { isGoogleVoice } from "@/lib/utils";
+import { isGoogleVoice } from "@/lib/voices";
+
+const MAX_REQUEST_BODY_LENGTH = 1200;
 
 export type APIRequestBodyType = {
   messages: ChatMessage[];

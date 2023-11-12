@@ -1,7 +1,6 @@
 import { v3 } from "./babylonjs/utils";
-import { CameraConfig, Model, ModelConfig, Voice } from "./types";
+import { CameraConfig, Model, ModelConfig } from "./types";
 
-export const MAX_REQUEST_BODY_LENGTH = 1200;
 export const MAX_WORD_SUGGESTION = 60;
 
 export const OPENAI_TIMEOUT_MILLISECONDS = 5_000;
@@ -22,26 +21,6 @@ export const DEFAULT_VOICE = "en-US-Neural2-H";
 // export const DEFAULT_VOICE = "nova";
 
 export const DEFAULT_MODEL: Model = "vroid_girl1";
-
-export const voices = {
-  "en-US-Neural2-A": { gender: "MALE", provider: "Google Cloud" },
-  "en-US-Neural2-C": { gender: "FEMALE", provider: "Google Cloud" },
-  "en-US-Neural2-D": { gender: "MALE", provider: "Google Cloud" },
-  "en-US-Neural2-E": { gender: "FEMALE", provider: "Google Cloud" },
-  "en-US-Neural2-F": { gender: "FEMALE", provider: "Google Cloud" },
-  "en-US-Neural2-G": { gender: "FEMALE", provider: "Google Cloud" },
-  "en-US-Neural2-H": { gender: "FEMALE", provider: "Google Cloud" },
-  "en-US-Neural2-I": { gender: "MALE", provider: "Google Cloud" },
-  "en-US-Neural2-J": { gender: "MALE", provider: "Google Cloud" },
-  alloy: { gender: "FEMALE", provider: "OpenAI" },
-  echo: { gender: "MALE", provider: "OpenAI" },
-  fable: { gender: "MALE", provider: "OpenAI" },
-  onyx: { gender: "MALE", provider: "OpenAI" },
-  nova: { gender: "FEMALE", provider: "OpenAI" },
-  shimmer: { gender: "FEMALE", provider: "OpenAI" },
-} as const;
-
-export const voiceNames: Voice[] = Object.keys(voices) as Voice[];
 
 export const defaultCameraConfig: CameraConfig = {
   alpha: Math.PI / 2,
