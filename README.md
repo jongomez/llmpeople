@@ -30,9 +30,9 @@ You can switch between these models in the settings modal.
 
 You can share your model and settings by copying the URL in the settings modal. This URL contains the model and settings you are currently using. When someone visits this URL, they will see the same model and settings you are currently using. For example, the following URL:
 
-[https://www.llmpeople.com/?model=vest_dude&voice=fable&prompt=Prompt+-+respond+as+spongebob](https://www.llmpeople.com/?model=vest_dude&voice=fable&prompt=Prompt+-+respond+as+spongebob)
+[https://www.llmpeople.com/?model=vest_dude&voice=en-US-Neural2-I&prompt=Prompt+-+respond+as+spongebob](https://www.llmpeople.com/?model=vest_dude&voice=en-US-Neural2-I&prompt=Prompt+-+respond+as+spongebob)(https://www.llmpeople.com/?model=vest_dude&voice=fable&prompt=Prompt+-+respond+as+spongebob)](https://www.llmpeople.com/?model=vest_dude&voice=fable&prompt=Prompt+-+respond+as+spongebob)
 
-Will load the `vest_dude` model, the `fable` voice, and the prompt `Prompt - respond as spongebob`
+Will load the `vest_dude` model, the `en-US-Neural2-I` voice, and the prompt `Prompt - respond as spongebob`
 
 # Use a custom model
 
