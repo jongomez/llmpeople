@@ -6,9 +6,9 @@ It uses BabylonJS, NextJS, TypeScript, and the OpenAI API.
 
 An OpenAI API key is required. Check out the OPENAI_API_KEY env var in the .env file. If instead of OpenAI's voices you wish to use Google Cloud's voices, you'll need a Google Cloud API key - and use the GOOGLE_CLOUD_API_KEY env var instead.
 
-1. **Install npm** - [nvm](https://github.com/nvm-sh/nvm#installing-and-updating) and node version 18.14.2 are recommended (this is the LTS version as of June 25 2023)
+1. **Install npm** - [nvm](https://github.com/nvm-sh/nvm#installing-and-updating) is recommended. `nvm install --lts` installs the latest node LST version.
 
-2. **Make sure npm is installed**. You can run `npm -v` to check if it's installed.
+2. **Make sure npm is installed**. `npm -v` to check if it's installed.
 
 3. **Install yarn** - `npm install --global yarn`
 
