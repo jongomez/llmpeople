@@ -3,15 +3,15 @@
 import { sendChatMessage } from "@/lib/chat/messageHandlingUtils";
 import media from "@/lib/styleUtils";
 import { ChatMessage, ChatState, MainStateDispatch, SettingsType } from "@/lib/types";
-import { Loader2, SendIcon } from "lucide-react";
-import { memo, useEffect, useRef } from "react";
+import { Loader2, SendIcon, Mic } from "lucide-react";
+import { memo, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { useGameContext } from "../GameContextProvider";
 import { useInitialChatMessage } from "../hooks";
 import { ChatErrors } from "./ChatErrors.server";
 import { LLMMessage } from "./LLMMessage.client";
 import { UserMessage } from "./UserMessage.server";
-
+import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 type ChatMessagesProps = {
   messages: ChatMessage[];
 };
@@ -58,7 +58,17 @@ export const ChatTextArea = ({ mainStateDispatch, chatState, settings }: ChatTex
       textAreaRef.current.scrollTop = textAreaRef.current.scrollHeight;
     }
   }, [textAreaRef]);
-
+  const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } =
+    useSpeechRecognition();
+  const listen = async () => {
+    await SpeechRecognition.startListening({
+      continuous: false,
+      language: "en-GB",
+    });
+  };
+  if (textAreaRef.current) {
+    textAreaRef.current.value = transcript;
+  }
   return (
     <TextareaWrapper>
       <Textarea
@@ -107,6 +117,7 @@ export const ChatTextArea = ({ mainStateDispatch, chatState, settings }: ChatTex
             <SendIcon size={iconSize} className="send-icon" />
           )}
         </SendButton>
+        <Mic onClick={listen} />
       </SendButtonWrapper>
     </TextareaWrapper>
   );

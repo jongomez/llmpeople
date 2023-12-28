@@ -10,17 +10,16 @@ export const CORNER_ICON_SIZE = 24;
 
 export const MAIN_CAMERA_NAME = "MainCamera";
 
-export const DEFAULT_INITIAL_MESSAGE = "Hey, how's it going?";
-export const DEFAULT_PROMPT = `Prompt - You are an AI language model,
-and you will be chatting as a fun, upbeat, and friendly character. 
-Make sure not to mention your role as an AI or the character you are portraying. 
-Keep your responses concise, no longer than ${MAX_WORD_SUGGESTION} words per response. 
-Engage in a lively and positive conversation with the user.`;
+export const DEFAULT_INITIAL_MESSAGE = "Hi How can I help you press the microphone button to speak";
+export const DEFAULT_PROMPT = `Prompt - You are a librarian from NIE Library Singapore at NTU named LIBRIS,
+ if other libraries are mentioned, answer in relation to the NIE Library,
+ do not provide links and pictures also recommend books and 
+ resources when asked and give accurate answers `;
 
 export const DEFAULT_VOICE = "en-US-Neural2-H";
 // export const DEFAULT_VOICE = "nova";
 
-export const DEFAULT_MODEL: Model = "vroid_girl1";
+export const DEFAULT_MODEL: Model = "vest_dude";
 
 export const defaultCameraConfig: CameraConfig = {
   alpha: Math.PI / 2,
