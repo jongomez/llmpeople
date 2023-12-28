@@ -11,7 +11,6 @@ import {
 
 const CHAT_MESSAGES_URL = "/api/chat";
 const OPENAI_TIMEOUT_MILLISECONDS = 10_000;
-
 export type ChatServerResponse =
   | string
   | {

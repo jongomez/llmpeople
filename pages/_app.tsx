@@ -4,7 +4,7 @@ import { AppProps } from "next/app";
 import Head from "next/head";
 import "raf/polyfill";
 import "./globalCSS.css";
-
+import "regenerator-runtime/runtime";
 // Taken from: https://tanstack.com/query/latest/docs/react/overview
 const queryClient = new QueryClient();
 
