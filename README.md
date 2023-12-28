@@ -26,7 +26,7 @@ There are 2 models available:
 
 You can switch between these models in the settings modal.
 
-# Share your model and settings
+## Share your model and settings
 
 You can share your model and settings by copying the URL in the settings modal. This URL contains the model and settings you are currently using. When someone visits this URL, they will see the same model and settings you are currently using. For example, the following URL:
 
