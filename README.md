@@ -2,7 +2,7 @@ This is a monorepo for the [llmpeople project - chat with a 3D model powered by 
 
 It uses BabylonJS, NextJS, TypeScript, and the OpenAI API.
 
-# HOW TO SET UP
+## How to setup
 
 An OpenAI API key is required. Check out the OPENAI_API_KEY env var in the .env file. If instead of OpenAI's voices you wish to use Google Cloud's voices, you'll need a Google Cloud API key - and use the GOOGLE_CLOUD_API_KEY env var instead.
 
@@ -16,7 +16,7 @@ An OpenAI API key is required. Check out the OPENAI_API_KEY env var in the .env 
 
 5. **Run the project** - Run `yarn dev` in the root folder of this project.
 
-# Models
+## Models
 
 There are 2 models available:
 
@@ -34,7 +34,7 @@ You can share your model and settings by copying the URL in the settings modal. 
 
 Will load the `vest_dude` model, the `en-US-Neural2-I` voice, and the prompt `Prompt - respond as spongebob`
 
-# Use a custom model
+## Use a custom model
 
 If you wish to use a custom model, the recommended way is to use [Blender](https://www.blender.org/) and follow the steps below:
 
