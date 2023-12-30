@@ -89,6 +89,8 @@ const PrivacyPolicyContent = styled.div`
   background-color: white;
   flex-direction: column;
   display: flex;
+
+  margin: 0 10px;
 `;
 
 const PrivacyPolicyContainer = styled.div`
@@ -96,8 +98,9 @@ const PrivacyPolicyContainer = styled.div`
   bottom: 30px;
   left: 0;
   right: 0;
-  justify-content: center;
   display: flex;
-  margin: 0 10px;
+  margin: 0 auto;
   z-index: 10000;
+
+  max-width: 500px;
 `;

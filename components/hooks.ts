@@ -1,6 +1,6 @@
 import { DEFAULT_INITIAL_MESSAGE, DEFAULT_MODEL } from "@/lib/constants";
-import { ChatMessage, MainStateDispatch, Model, SettingsType, Voice } from "@/lib/types";
-import { isModelValid } from "@/lib/utils";
+import { ChatMessage, MainStateDispatch, Model, SettingsType, SpeechRecognitionLanguageCode, Voice } from "@/lib/types";
+import { isModelValid, isSpeechLangCodeValid } from "@/lib/utils";
 import { isVoiceValid } from "@/lib/voices";
 import { useEffect, useRef, useState } from "react";
 
@@ -119,12 +119,14 @@ export const useGetInitialSettings = (
     const paramsModel = params.get("model");
     const paramsVoice = params.get("voice");
     const paramsPrompt = params.get("prompt");
+    const paramsSpeechLang = params.get("speechLang");
 
     const initialSettings: SettingsType = {
       model: isModelValid(paramsModel) ? (paramsModel as Model) : DEFAULT_MODEL,
       voice: isVoiceValid(paramsVoice) ? (paramsVoice as Voice) : settings.voice,
       prompt: paramsPrompt || settings.prompt,
       initialMessage: params.get("initialMessage") || settings.initialMessage,
+      speechRecognitionLanguageCode: isSpeechLangCodeValid(paramsSpeechLang) ? (paramsSpeechLang as SpeechRecognitionLanguageCode) : settings.speechRecognitionLanguageCode,
     };
 
     mainStateDispatch({

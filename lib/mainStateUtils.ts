@@ -1,4 +1,4 @@
-import { DEFAULT_INITIAL_MESSAGE, DEFAULT_PROMPT, DEFAULT_VOICE } from "./constants";
+import { DEFAULT_INITIAL_MESSAGE, DEFAULT_PROMPT, DEFAULT_SPEECH_RECOGNITION_LANGUAGE_CODE, DEFAULT_VOICE } from "./constants";
 import { MainState, MainStateAction } from "./types";
 
 // Defining the localStorage key globally
@@ -24,6 +24,7 @@ export const defaultState: MainState = {
     voice: DEFAULT_VOICE,
     prompt: DEFAULT_PROMPT,
     initialMessage: DEFAULT_INITIAL_MESSAGE,
+    speechRecognitionLanguageCode: DEFAULT_SPEECH_RECOGNITION_LANGUAGE_CODE,
     // XXX: model is null at the beginning. Because we will first check the URL for a model.
     // If we loaded a model here different from the URL model, we'd need to load 2 models at startup.
     model: null,

@@ -2,6 +2,7 @@ import { Vector3 } from "babylonjs";
 import { Dispatch } from "react";
 import { Humanoid } from "./babylonjs/Humanoid";
 import { models } from "./constants";
+import { speechRecognitionLanguages } from "./speechRecognitionLanguages";
 import { voices } from "./voices";
 
 type SoundController = {
@@ -17,6 +18,8 @@ export type VoiceInfo = {
 };
 
 export type Voice = keyof typeof voices;
+export type SpeechRecognitionLanguageName = typeof speechRecognitionLanguages[keyof typeof speechRecognitionLanguages];
+export type SpeechRecognitionLanguageCode = keyof typeof speechRecognitionLanguages;
 
 export type CameraConfig = {
   alpha: number;
@@ -46,6 +49,7 @@ export type SettingsType = {
   voice: Voice;
   prompt: string;
   initialMessage: string;
+  speechRecognitionLanguageCode: SpeechRecognitionLanguageCode;
 };
 
 export type HumanoidRef = React.MutableRefObject<Humanoid | null>;
@@ -74,23 +78,23 @@ export type MainStateAction =
   | { type: "TOGGLE_SETTINGS_MODAL" }
   | { type: "SET_SETTINGS"; payload: SettingsType }
   | {
-      type: "HANDLE_SOUND";
-      payload: {
-        audio: HTMLAudioElement;
-        currentSoundRef: CurrentSoundRef;
-        humanoidRef: HumanoidRef;
-      };
-    }
-  | {
-      type: "UPDATE_CHAT_STATE";
-      payload: {
-        newMessage?: ChatMessage;
-        isLoadingMessage?: boolean;
-        abortController?: AbortController;
-        errorMessage?: string;
-        textAreaValue?: string;
-      };
+    type: "HANDLE_SOUND";
+    payload: {
+      audio: HTMLAudioElement;
+      currentSoundRef: CurrentSoundRef;
+      humanoidRef: HumanoidRef;
     };
+  }
+  | {
+    type: "UPDATE_CHAT_STATE";
+    payload: {
+      newMessage?: ChatMessage;
+      isLoadingMessage?: boolean;
+      abortController?: AbortController;
+      errorMessage?: string;
+      textAreaValue?: string;
+    };
+  };
 
 export type MainStateDispatch = Dispatch<MainStateAction>;
 

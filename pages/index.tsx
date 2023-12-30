@@ -169,7 +169,7 @@ const Game: React.FC<GameProps> = ({ hasGoogleApiKey }) => {
 };
 
 const TopCornerButtons = styled.div`
-  position: absolute;
+  position: fixed;
   top: 12px;
   left: 15px;
 
@@ -178,7 +178,7 @@ const TopCornerButtons = styled.div`
   justify-content: center;
   gap: 12px;
 
-  z-index: 10000;
+  z-index: 100000;
 `;
 
 export default Game;

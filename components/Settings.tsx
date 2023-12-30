@@ -3,10 +3,12 @@ import {
   DEFAULT_INITIAL_MESSAGE,
   DEFAULT_MODEL,
   DEFAULT_PROMPT,
+  DEFAULT_SPEECH_RECOGNITION_LANGUAGE_CODE,
   DEFAULT_VOICE,
-  models,
+  models
 } from "@/lib/constants";
-import { MainStateDispatch, Model, SettingsType, Voice } from "@/lib/types";
+import { speechRecognitionLanguages } from "@/lib/speechRecognitionLanguages";
+import { MainStateDispatch, Model, SettingsType, SpeechRecognitionLanguageCode, Voice } from "@/lib/types";
 import { isGoogleVoice, voiceNames, voices } from "@/lib/voices";
 import { Settings } from "lucide-react";
 import { FC } from "react";
@@ -29,6 +31,7 @@ const SettingsModalContent: FC<SettingsModalContentProps> = ({
   const currentVoice = settings.voice;
   const currentPrompt = settings.prompt;
   const currentInitialMessage = settings.initialMessage;
+  const currentSpeechRecognitionLanguageCode = settings.speechRecognitionLanguageCode;
 
   const handleSettingsChange = (settings: SettingsType) => {
     mainStateDispatch({
@@ -54,6 +57,9 @@ const SettingsModalContent: FC<SettingsModalContentProps> = ({
     if (settings.initialMessage !== DEFAULT_INITIAL_MESSAGE) {
       params.set("initialMessage", settings.initialMessage);
     }
+    if (settings.speechRecognitionLanguageCode !== DEFAULT_SPEECH_RECOGNITION_LANGUAGE_CODE) {
+      params.set("speechLang", settings.speechRecognitionLanguageCode);
+    }
 
     const paramsString = params.toString();
     const url = `${window.location.origin}${window.location.pathname}`;
@@ -63,12 +69,13 @@ const SettingsModalContent: FC<SettingsModalContentProps> = ({
 
   return (
     <SettingsContainer>
+      {/* Model */}
       <SettingRow>
         <label style={{ margin: "auto 0" }}>Model:</label>
         <SettingsSelect
           value={currentModel as Model}
           onChange={(e) => handleSettingsChange({ ...settings, model: e.target.value as Model })}
-          // onBlur={handleSettingsChange}
+        // onBlur={handleSettingsChange}
         >
           {Object.keys(models).map((modelName) => (
             <option key={modelName} value={modelName}>
@@ -77,6 +84,8 @@ const SettingsModalContent: FC<SettingsModalContentProps> = ({
           ))}
         </SettingsSelect>
       </SettingRow>
+
+      {/* Voice */}
       <SettingRow>
         <label style={{ margin: "auto 0" }}>Voice:</label>
         <SettingsSelect
@@ -104,7 +113,7 @@ const SettingsModalContent: FC<SettingsModalContentProps> = ({
           target="_blank"
           rel="noreferrer"
         >
-          Google Cloud Text to Speech Voices
+          Google Cloud text to speech voices
         </a>
       </SettingRow>
       <SettingRow>
@@ -114,10 +123,11 @@ const SettingsModalContent: FC<SettingsModalContentProps> = ({
           target="_blank"
           rel="noreferrer"
         >
-          OpenAI Text to Speech Voices
+          OpenAI text to speech voices
         </a>
       </SettingRow>
 
+      {/* Prompt */}
       <SettingRow>
         <label>Prompt:</label>
         <SettingsTextArea
@@ -127,6 +137,8 @@ const SettingsModalContent: FC<SettingsModalContentProps> = ({
           style={{ width: "100%" }}
         ></SettingsTextArea>
       </SettingRow>
+
+      {/* Initial Message */}
       <SettingRow>
         <label>Initial Message:</label>
         <SettingsTextArea
@@ -137,6 +149,33 @@ const SettingsModalContent: FC<SettingsModalContentProps> = ({
         ></SettingsTextArea>
       </SettingRow>
 
+      {/* Speech Recognition Language */}
+      <SettingRow>
+        <label style={{ margin: "auto 0" }}>Speech Recog. Language:</label>
+        <SettingsSelect
+          value={currentSpeechRecognitionLanguageCode}
+          onChange={(e) => handleSettingsChange({ ...settings, speechRecognitionLanguageCode: e.target.value as SpeechRecognitionLanguageCode })}
+        >
+          {Object.keys(speechRecognitionLanguages).map((languageCode) => (
+            <option key={languageCode} value={languageCode}>
+              {speechRecognitionLanguages[languageCode as SpeechRecognitionLanguageCode]}
+            </option>
+          ))}
+        </SettingsSelect>
+      </SettingRow>
+      <SettingRow>
+        <label></label>
+        <a
+          href="https://github.com/JamesBrill/react-speech-recognition/blob/master/docs/API.md#language-string"
+          target="_blank"
+          rel="noreferrer"
+        >
+          All available speech recognition languages
+        </a>
+      </SettingRow>
+
+
+      {/* Shareable URL */}
       <SettingRow>
         <label>Shareable URL:</label>
         <SettingsTextArea

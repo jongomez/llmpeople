@@ -1,4 +1,5 @@
 import { models } from "./constants";
+import { speechRecognitionLanguages } from "./speechRecognitionLanguages";
 
 export function isWebview(): boolean {
   if (typeof window === undefined) {
@@ -35,3 +36,15 @@ export const isModelValid = (model: string | null): boolean => {
 
   return true;
 };
+
+export const isSpeechLangCodeValid = (languageCode: string | null): boolean => {
+  if (!languageCode) {
+    return false;
+  }
+
+  if (!Object.keys(speechRecognitionLanguages).includes(languageCode)) {
+    return false;
+  }
+
+  return true;
+}

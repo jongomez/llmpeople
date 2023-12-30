@@ -3,15 +3,15 @@
 import { sendChatMessage } from "@/lib/chat/messageHandlingUtils";
 import media from "@/lib/styleUtils";
 import { ChatMessage, ChatState, MainStateDispatch, SettingsType } from "@/lib/types";
-import { Loader2, SendIcon, Mic } from "lucide-react";
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef } from "react";
+import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 import styled from "styled-components";
 import { useGameContext } from "../GameContextProvider";
 import { useInitialChatMessage } from "../hooks";
+import { ChatButtonIcon } from "./ChatButtonIcon.client";
 import { ChatErrors } from "./ChatErrors.server";
 import { LLMMessage } from "./LLMMessage.client";
 import { UserMessage } from "./UserMessage.server";
-import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 type ChatMessagesProps = {
   messages: ChatMessage[];
 };
@@ -39,6 +39,13 @@ const ChatMessages = memo(function ChatMessages({ messages }: ChatMessagesProps)
   );
 });
 
+const listen = async (language: string): Promise<void> => {
+  await SpeechRecognition.startListening({
+    continuous: false,
+    language,
+  });
+};
+
 type ChatTextAreProps = {
   mainStateDispatch: MainStateDispatch;
   chatState: ChatState;
@@ -48,9 +55,10 @@ type ChatTextAreProps = {
 export const ChatTextArea = ({ mainStateDispatch, chatState, settings }: ChatTextAreProps) => {
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const { currentSoundRef, humanoidRef } = useGameContext();
-
+  const { transcript, listening, resetTranscript, isMicrophoneAvailable, browserSupportsSpeechRecognition } =
+    useSpeechRecognition();
   const { isLoadingMessage } = chatState;
-  const iconSize = 26;
+  const hasText = textAreaRef.current ? textAreaRef.current.value.length > 0 : false;
 
   // The following useEffect is used to scroll to the bottom of the text area.
   useEffect(() => {
@@ -58,17 +66,18 @@ export const ChatTextArea = ({ mainStateDispatch, chatState, settings }: ChatTex
       textAreaRef.current.scrollTop = textAreaRef.current.scrollHeight;
     }
   }, [textAreaRef]);
-  const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } =
-    useSpeechRecognition();
-  const listen = async () => {
-    await SpeechRecognition.startListening({
-      continuous: false,
-      language: "en-GB",
-    });
-  };
-  if (textAreaRef.current) {
-    textAreaRef.current.value = transcript;
-  }
+
+  // The following useEffect updates the text area value when the speech recognition transcript is updated.
+  useEffect(() => {
+    if (textAreaRef.current) {
+      textAreaRef.current.value = transcript;
+      mainStateDispatch({
+        type: "UPDATE_CHAT_STATE",
+        payload: { textAreaValue: transcript },
+      });
+    }
+  }, [transcript]);
+
   return (
     <TextareaWrapper>
       <Textarea
@@ -95,30 +104,32 @@ export const ChatTextArea = ({ mainStateDispatch, chatState, settings }: ChatTex
           });
         }}
       />
-      <SendButtonWrapper>
-        <SendButton
-          disabled={isLoadingMessage}
-          onClick={() =>
-            sendChatMessage(
-              textAreaRef,
-              mainStateDispatch,
-              currentSoundRef,
-              humanoidRef,
-              chatState,
-              settings
-            )
+      <ChatButtonWrapper>
+        <ChatButton
+          disabled={isLoadingMessage || listening}
+          onClick={() => {
+            if (hasText) {
+              sendChatMessage(
+                textAreaRef,
+                mainStateDispatch,
+                currentSoundRef,
+                humanoidRef,
+                chatState,
+                settings
+              )
+            } else if (!isMicrophoneAvailable) {
+              window.alert("Microphone is not available :(");
+            } else if (!browserSupportsSpeechRecognition) {
+              window.alert("Speech Recognition API is not supported in your browser :(");
+            } else {
+              listen("en-GB");
+            }
+          }
           }
         >
-          {isLoadingMessage ? (
-            <LoaderWrapper>
-              <Loader2 size={iconSize} />
-            </LoaderWrapper>
-          ) : (
-            <SendIcon size={iconSize} className="send-icon" />
-          )}
-        </SendButton>
-        <Mic onClick={listen} />
-      </SendButtonWrapper>
+          <ChatButtonIcon isLoadingMessage={isLoadingMessage} hasText={hasText} />
+        </ChatButton>
+      </ChatButtonWrapper>
     </TextareaWrapper>
   );
 };
@@ -213,20 +224,13 @@ const Textarea = styled.textarea`
   `}
 `;
 
-const SendButtonWrapper = styled.div`
+const ChatButtonWrapper = styled.div`
   position: absolute;
   right: 18px;
 `;
 
-const LoaderWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-`;
 
-const SendButton = styled.button<{ disabled: boolean }>`
+const ChatButton = styled.button<{ disabled: boolean }>`
   cursor: pointer;
   border: none;
 
@@ -237,11 +241,7 @@ const SendButton = styled.button<{ disabled: boolean }>`
 
   color: #ffffff;
   border-radius: 6px;
-  padding: 0.25rem;
 
-  .send-icon {
-    position: relative;
-    top: 3px;
-    right: 1px;
-  }
+  height: 33px;
+  width: 33px;
 `;
