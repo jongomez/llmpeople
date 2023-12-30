@@ -2,7 +2,7 @@
 
 import { sendChatMessage } from "@/lib/chat/messageHandlingUtils";
 import media from "@/lib/styleUtils";
-import { ChatMessage, ChatState, MainStateDispatch, SettingsType } from "@/lib/types";
+import { ChatMessage, ChatState, MainStateDispatch, SettingsType, SpeechRecognitionLanguageCode } from "@/lib/types";
 import { memo, useEffect, useRef } from "react";
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 import styled from "styled-components";
@@ -39,7 +39,7 @@ const ChatMessages = memo(function ChatMessages({ messages }: ChatMessagesProps)
   );
 });
 
-const listen = async (language: string): Promise<void> => {
+const listen = async (language: SpeechRecognitionLanguageCode): Promise<void> => {
   await SpeechRecognition.startListening({
     continuous: false,
     language,
@@ -122,7 +122,7 @@ export const ChatTextArea = ({ mainStateDispatch, chatState, settings }: ChatTex
             } else if (!browserSupportsSpeechRecognition) {
               window.alert("Speech Recognition API is not supported in your browser :(");
             } else {
-              listen("en-GB");
+              listen(settings.speechRecognitionLanguageCode);
             }
           }
           }
