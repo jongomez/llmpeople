@@ -72,3 +72,7 @@ export const models = {
 } as const;
 
 ```
+
+## Speech Recognition
+
+This project uses [react-speech-recognition](https://www.npmjs.com/package/react-speech-recognition), which in turn uses the [Web Speech API's SpeechRecognition](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition). The language for speech recognition can be set in the settings. The default is `en-US`.
