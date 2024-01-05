@@ -113,12 +113,13 @@ export async function synthesizeSpeechGoogle(text: string, voice: string): Promi
 
   const apiKey = process.env.GOOGLE_API_KEY;
   const apiURL = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`;
-
+  const splitVoice = voice.split("-");
+  const langCode = splitVoice[0] + "-" + splitVoice[1];
   const requestBody = {
     input: {
       text,
     },
-    voice: { languageCode: "en-US", name: voice },
+    voice: { languageCode: langCode, name: voice },
     audioConfig: {
       audioEncoding: "MP3",
     },
