@@ -343,19 +343,13 @@ export class Humanoid {
   }
 
   getRandomIdleAnim(): string {
-    // NOTE: idle1 also exists, but it's not very good.
-    const idleAnims: string[] = ["idle3_hand_hips", "idle2"];
-
     // NOTE: The | "idle3_hand_hips" is there only to make TypeScript happy.
-    return sample(idleAnims) || "idle3_hand_hips";
+    return sample(this.modelConfig.idleAnimations) || "idle3_hand_hips";
   }
 
   getRandomTalkingAnim(): string {
-    //const talkingAnims: Anims[] = ["talking1", "talking3"];
-    const talkingAnims: string[] = ["talking1", "talking2_head_shake", "talking3"];
-
     // NOTE: The | "talking3" is there only to make TypeScript happy.
-    return sample(talkingAnims) || "talking3";
+    return sample(this.modelConfig.talkingBodyAnimations) || "talking3";
   }
 
   talkAnimationEnd(info: string, playRandomIdleAnim = true) {
