@@ -343,13 +343,23 @@ export class Humanoid {
   }
 
   getRandomIdleAnim(): string {
-    // NOTE: The | "idle3_hand_hips" is there only to make TypeScript happy.
-    return sample(this.modelConfig.idleAnimations) || "idle3_hand_hips";
+    const sampledIdleAnim = sample(this.modelConfig.idleAnimations)
+
+    if (!sampledIdleAnim) {
+      throw new Error("Failed to get sampledIdleAnim :(");
+    }
+
+    return sampledIdleAnim;
   }
 
   getRandomTalkingAnim(): string {
-    // NOTE: The | "talking3" is there only to make TypeScript happy.
-    return sample(this.modelConfig.talkingBodyAnimations) || "talking3";
+    const sampledTalkingAnim = sample(this.modelConfig.talkingBodyAnimations)
+
+    if (!sampledTalkingAnim) {
+      throw new Error("Failed to get sampledTalkingAnim :(");
+    }
+
+    return sampledTalkingAnim;
   }
 
   talkAnimationEnd(info: string, playRandomIdleAnim = true) {
