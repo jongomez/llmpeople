@@ -445,7 +445,7 @@ export class Humanoid {
       });
     };
 
-    alternateBetweenAnims(this.getRandomTalkingAnim(), this.currentAnimName || "idle3_hand_hips");
+    alternateBetweenAnims(this.getRandomTalkingAnim(), this.getRandomTalkingAnim());
   }
 
   dispose() {
