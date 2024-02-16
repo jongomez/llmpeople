@@ -445,7 +445,7 @@ export class Humanoid {
       });
     };
 
-    alternateBetweenAnims(this.getRandomTalkingAnim(), this.getRandomTalkingAnim());
+    alternateBetweenAnims(this.getRandomTalkingAnim(), this.currentAnimName);
   }
 
   dispose() {
