@@ -10,7 +10,7 @@ An OpenAI API key is required. Check out the OPENAI_API_KEY env var in the .env 
 
 2. **Make sure npm is installed**. `npm -v` to check if it's installed.
 
-3. **Install yarn** - `npm install --global yarn`
+3. **Install Corepack (needed for yarn)** - `npm install -g corepack`
 
 4. **Install the dependencies** - Simply run `yarn` in the root folder of this project.
 
