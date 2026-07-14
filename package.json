@@ -13,7 +13,6 @@
     "@babel/core": "^7.24.7",
     "@babylonjs/core": "^6.19.1",
     "@babylonjs/loaders": "^6.19.1",
-    "@google-cloud/text-to-speech": "^4.2.1",
     "@tanstack/react-query": "^4.28.0",
     "babylonjs": "^6.19.1",
     "babylonjs-gltf2interface": "^6.0.0",
