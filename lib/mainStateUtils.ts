@@ -152,9 +152,10 @@ export const mainStateReducer = (draft: MainState, action: MainStateAction): Mai
     case "SET_SETTINGS": {
       const settings = action.payload;
 
-      if (settings.initialMessage !== draft.settings.initialMessage) {
+      if (settings.initialMessage !== draft.settings.initialMessage && draft.chatState.messages[0]) {
         // If a new initial message is set, update the chat history.
         // Replace first message with the new initial message.
+        // (Guard against an empty messages array - the initial message may not have been added yet.)
         draft.chatState.messages[0].content = settings.initialMessage;
       }
 

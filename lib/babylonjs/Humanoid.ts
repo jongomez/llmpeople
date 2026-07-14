@@ -12,7 +12,6 @@ import {
   Skeleton,
   Vector3,
 } from "babylonjs";
-import { random, sample } from "lodash";
 import { getMorphTargetIndex, playMorphTargetAnim } from "./utils";
 // Enable GLTF/GLB loader (side-effects)
 import "@babylonjs/loaders/glTF";
@@ -20,6 +19,13 @@ import "babylonjs-loaders";
 import { ModelConfig } from "../types";
 
 type MyMesh = AbstractMesh | Mesh;
+
+// Local replacements for lodash's `random` and `sample` (avoids the dependency).
+// `random` returns a value in the range [min, max) - used here only for random timing.
+const random = (min: number, max: number): number => min + Math.random() * (max - min);
+// `sample` returns a random element of the array (or undefined if it's empty).
+const sample = <T>(array: readonly T[]): T | undefined =>
+  array[Math.floor(Math.random() * array.length)];
 
 export class Humanoid {
   name: string = "";

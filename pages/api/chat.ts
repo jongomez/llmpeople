@@ -1,13 +1,11 @@
 import {
   OpenAI,
   OpenAIPayload,
-  synthesizeSpeechGoogle,
   synthesizeSpeechOpenAi,
   validateRequest,
 } from "@/lib/backendUtils";
 import { dummyBotAudio, dummyBotMessages } from "@/lib/dummyResponses";
 import { ChatMessage } from "@/lib/types";
-import { isGoogleVoice } from "@/lib/voices";
 
 const MAX_REQUEST_BODY_LENGTH = 1200;
 
@@ -100,11 +98,7 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     if (devMode) console.log("Converting aiResponse to audio.");
-    if (isGoogleVoice(voice)) {
-      audioContent = await synthesizeSpeechGoogle(aiResponse, voice);
-    } else {
-      audioContent = await synthesizeSpeechOpenAi(aiResponse, voice);
-    }
+    audioContent = await synthesizeSpeechOpenAi(aiResponse, voice);
   } catch (error) {
     console.error(error);
     return new Response(JSON.stringify({ error: "Error fetching audio :(" }), {

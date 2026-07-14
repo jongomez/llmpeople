@@ -9,7 +9,7 @@ import {
 } from "@/lib/constants";
 import { speechRecognitionLanguages } from "@/lib/speechRecognitionLanguages";
 import { MainStateDispatch, Model, SettingsType, SpeechRecognitionLanguageCode, Voice } from "@/lib/types";
-import { isGoogleVoice, voiceNames, voices } from "@/lib/voices";
+import { voiceNames, voices } from "@/lib/voices";
 import { Settings } from "lucide-react";
 import { FC } from "react";
 import styled from "styled-components";
@@ -19,13 +19,11 @@ import { Modal } from "./Modal";
 type SettingsModalContentProps = {
   mainStateDispatch: MainStateDispatch;
   settings: SettingsType;
-  hasGoogleApiKey: boolean;
 };
 
 const SettingsModalContent: FC<SettingsModalContentProps> = ({
   mainStateDispatch,
   settings,
-  hasGoogleApiKey,
 }) => {
   const currentModel = settings.model;
   const currentVoice = settings.voice;
@@ -94,27 +92,11 @@ const SettingsModalContent: FC<SettingsModalContentProps> = ({
         >
           {voiceNames.map((voiceName) => (
             <option key={voiceName} value={voiceName}>
-              {voices[voiceName].gender}: {voiceName} ({voices[voiceName].provider})
+              {voices[voiceName].gender}: {voiceName}
+              {voices[voiceName].recommended ? " (recommended)" : ""}
             </option>
           ))}
         </SettingsSelect>
-      </SettingRow>
-      {!hasGoogleApiKey && isGoogleVoice(currentVoice) && (
-        <SettingRow style={{ color: "red" }}>
-          <label></label>
-          Warning: no Google Cloud key detected. Please select another voice.
-        </SettingRow>
-      )}
-      {/* <SettingRow style={{ justifyContent: "center" }}> */}
-      <SettingRow>
-        <label></label>
-        <a
-          href="https://cloud.google.com/text-to-speech/docs/voices"
-          target="_blank"
-          rel="noreferrer"
-        >
-          Google Cloud text to speech voices
-        </a>
       </SettingRow>
       <SettingRow>
         <label></label>
@@ -198,7 +180,6 @@ export const SettingsModal: FC<SettingsModalProps> = ({
   isOpen,
   settings,
   mainStateDispatch,
-  hasGoogleApiKey,
 }) => {
   return (
     <>
@@ -210,7 +191,6 @@ export const SettingsModal: FC<SettingsModalProps> = ({
           <SettingsModalContent
             mainStateDispatch={mainStateDispatch}
             settings={settings}
-            hasGoogleApiKey={hasGoogleApiKey}
           />
         </Modal>
       )}

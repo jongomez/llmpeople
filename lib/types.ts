@@ -9,14 +9,6 @@ type SoundController = {
   isVolumeOn: boolean;
 };
 
-export type Gender = "MALE" | "FEMALE";
-
-export type VoiceProvider = "Google Cloud" | "OpenAI";
-export type VoiceInfo = {
-  provider: VoiceProvider;
-  gender: Gender;
-};
-
 export type Voice = keyof typeof voices;
 export type SpeechRecognitionLanguageName = typeof speechRecognitionLanguages[keyof typeof speechRecognitionLanguages];
 export type SpeechRecognitionLanguageCode = keyof typeof speechRecognitionLanguages;

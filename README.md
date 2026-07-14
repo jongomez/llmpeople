@@ -4,7 +4,7 @@ It uses BabylonJS, NextJS, TypeScript, and the OpenAI API.
 
 ## How to setup
 
-An OpenAI API key is required. Check out the OPENAI_API_KEY env var in the .env file. If instead of OpenAI's voices you wish to use Google Cloud's voices, you'll need a Google Cloud API key - and use the GOOGLE_CLOUD_API_KEY env var instead.
+An OpenAI API key is required. Check out the OPENAI_API_KEY env var in the .env file.
 
 1. **Install npm** - [nvm](https://github.com/nvm-sh/nvm#installing-and-updating) is recommended. `nvm install --lts` installs the latest node LST version.
 
@@ -30,9 +30,9 @@ You can switch between these models in the settings modal.
 
 You can share your model and settings by copying the URL in the settings modal. This URL contains the model and settings you are currently using. When someone visits this URL, they will see the same model and settings you are currently using. For example, the following URL:
 
-[https://www.llmpeople.com/?model=vest_dude&voice=en-US-Neural2-I&prompt=Prompt+-+respond+as+spongebob](https://www.llmpeople.com/?model=vest_dude&voice=en-US-Neural2-I&prompt=Prompt+-+respond+as+spongebob)
+[https://www.llmpeople.com/?model=vest_dude&voice=cedar&prompt=Prompt+-+respond+as+spongebob](https://www.llmpeople.com/?model=vest_dude&voice=cedar&prompt=Prompt+-+respond+as+spongebob)
 
-Will load the `vest_dude` model, the `en-US-Neural2-I` voice, and the prompt `Prompt - respond as spongebob`
+Will load the `vest_dude` model, the `cedar` voice, and the prompt `Prompt - respond as spongebob`
 
 ## Use a custom model
 

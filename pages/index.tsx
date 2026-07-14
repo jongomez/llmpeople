@@ -86,11 +86,7 @@ const CanvasThatDoesNotReRender = React.memo(function CanvasThatDoesNotReRender(
   );
 });
 
-type GameProps = {
-  hasGoogleApiKey: boolean;
-};
-
-const Game: React.FC<GameProps> = ({ hasGoogleApiKey }) => {
+const Game: React.FC = () => {
   const [mainState, mainStateDispatch] = useImmerReducer<MainState, MainStateAction>(
     mainStateReducer,
     defaultState
@@ -133,7 +129,6 @@ const Game: React.FC<GameProps> = ({ hasGoogleApiKey }) => {
             isOpen={mainState.settingsModalIsOpen}
             mainStateDispatch={mainStateDispatch}
             settings={mainState.settings}
-            hasGoogleApiKey={hasGoogleApiKey}
           />
 
           <AboutModal isOpen={mainState.aboutModalIsOpen} mainStateDispatch={mainStateDispatch} />
@@ -182,14 +177,3 @@ const TopCornerButtons = styled.div`
 `;
 
 export default Game;
-
-export async function getStaticProps() {
-  const hasGoogleApiKey = Boolean(process.env.GOOGLE_API_KEY);
-
-  return {
-    props: {
-      hasGoogleApiKey,
-    },
-    // revalidate: 10,
-  };
-}

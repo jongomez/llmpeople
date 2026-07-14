@@ -18,7 +18,7 @@ Keep your responses concise, no longer than ${MAX_WORD_SUGGESTION} words per res
 Engage in a lively and positive conversation with the user.`;
 export const DEFAULT_SPEECH_RECOGNITION_LANGUAGE_CODE = "en-US";
 
-export const DEFAULT_VOICE = "en-US-Neural2-H";
+export const DEFAULT_VOICE = "marin";
 
 export const DEFAULT_MODEL: Model = "vroid_girl1";
 
@@ -31,7 +31,7 @@ export const defaultCameraConfig: CameraConfig = {
 
 const defaultConfig: ModelConfig = {
   cameraConfig: defaultCameraConfig,
-  voice: "en-US-Neural2-H",
+  voice: "marin",
   initialAnimation: "idle3_hand_hips",
   faceMeshName: "Face",
   morphTargets: {
